@@ -7,6 +7,12 @@ const PORT = 8080;
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    next();
+});
+
 // Initialize database and start server
 (async () => {
     try {
