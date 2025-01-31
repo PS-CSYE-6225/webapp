@@ -9,12 +9,12 @@ module.exports = async (sequelize) => {
         },
         datetime: {
             type: DataTypes.DATE,
-            allowNull: false,
             defaultValue: DataTypes.NOW,
-        },
+        }
     });
 
-    await HealthCheck.sync({ alter: true }); // Ensures the schema updates automatically
-    console.log('HealthCheck table is ready.');
+    await HealthCheck.sync({ alter: true }); // Ensure table is ready
+    console.log("HealthCheck table is ready.");
+
     return HealthCheck;
 };
