@@ -1,6 +1,5 @@
-#!/bin/bash
-
-# Update package lists
+#!/bin/bash 
+ #Update package lists
 echo "Updating package lists..."
 sudo apt update -y
 
