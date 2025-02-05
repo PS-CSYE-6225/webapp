@@ -32,11 +32,30 @@ describe("Health Check API Tests", () => {
             .expect(400);
     });
 
-    //  Should return 405 Method Not Allowed for non-GET requests
-    it("should return 405 Method Not Allowed on POST /healthz", async () => {
+    it("should return 400 Bad Request on GET /healthz with broken JSON", async () => {
         await request(app)
-            .post("/healthz")
-            .expect(405);
+            .get("/healthz")
+            .set("Content-Type", "application/json")
+            .send('{ "invalidJson": true ') 
+            .expect(400);
+    });
+
+    it("should return 400 Bad Request on GET /healthz with query parameters", async () => {
+        await request(app)
+            .get("/healthz?keyparam=value") 
+            .expect(400);
+    });
+
+    //  Should return 405 Method Not Allowed for non-GET requests
+    const nonGetMethods = ["post", "put", "delete", "patch"];
+
+    nonGetMethods.forEach((method) => {
+        it(`should return 405 Method Not Allowed on ${method.toUpperCase()} /healthz`, async () => {
+            await request(app)
+                [method]("/healthz") 
+                .expect(405);
+        });
+
     });
 
    /* it("should return 503 Service Unavailable when DB is not reachable", async () => {
