@@ -9,8 +9,11 @@ module.exports = async (sequelize) => {
         },
         datetime: {
             type: DataTypes.DATE,
+            allowNull: false,
             defaultValue: DataTypes.NOW,
-        }
+        },
+    }, {
+        timestamps: false 
     });
 
     await HealthCheck.sync({ alter: true }); // Ensure table is ready
