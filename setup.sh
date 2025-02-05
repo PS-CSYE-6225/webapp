@@ -43,7 +43,7 @@ sudo apt install -y nodejs
 
 # Create .env file with MySQL credentials
 echo "Creating .env file..."
-cat <<EOF | sudo tee /opt/csye6225/webapp/.env
+sudo bash -c 'cat > /opt/csye6225/webapp/.env <<EOF
 DB_HOST=10.116.0.2
 DB_USER=root
 DB_PASSWORD=root123
@@ -51,6 +51,9 @@ DB_NAME=CloudWebAppcsye625
 DB_PORT=3306
 NODE_ENV=production
 EOF
+'
+
+sudo chmod 600 /opt/csye6225/webapp/.env
 
 # Install Node.js Dependencies
 echo "Installing Node.js dependencies..."
