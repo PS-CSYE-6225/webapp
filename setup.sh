@@ -12,9 +12,27 @@ sudo apt upgrade -y
 echo "Installing MySQL..."
 sudo apt install mysql-server -y
 
+#echo "Configuring MySQL to allow remote connections..."
+sudo sed -i 's/^bind-address\s*=.*/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
+
+# Restart MySQL service
+echo "Restarting MySQL service..."
+sudo systemctl restart mysql
+
+
 # Create MySQL Database
 echo "Creating Database..."
 sudo mysql -e "CREATE DATABASE IF NOT EXISTS CloudWebAppcsye625;"
+
+# Grant MySQL Access to the Private IP
+echo "Granting MySQL access to private IP..."
+sudo mysql -u root -p <<EOF
+CREATE USER IF NOT EXISTS 'root'@'10.116.0.3' IDENTIFIED WITH mysql_native_password BY 'root123';
+ALTER USER 'root'@'10.116.0.3' IDENTIFIED WITH mysql_native_password BY 'root123';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'10.116.0.3' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+EXIT;
+EOF
 
 # Create Linux Group for Application
 echo "Creating Linux Group..."
@@ -44,7 +62,7 @@ sudo apt install -y nodejs
 # Create .env file with MySQL credentials
 echo "Creating .env file..."
 sudo bash -c 'cat > /opt/csye6225/webapp/.env <<EOF
-DB_HOST=10.116.0.2
+DB_HOST=10.116.0.3
 DB_USER=root
 DB_PASSWORD=root123
 DB_NAME=CloudWebAppcsye625
@@ -72,6 +90,15 @@ echo "To manually run the application, execute the following commands:"
 echo ""
 echo "cd /opt/csye6225/webapp"
 echo "node index.js"
+echo "To run test suits....npm test"
+echo ".................To Grant Permission.............................."
+echo "sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf"
+echo "sudo systemctl restart mysql"
+echo "sudo mysql -u root -p"
+echo "CREATE USER 'root'@'10.116.0.3' IDENTIFIED BY 'password';"
+echo "GRANT ALL PRIVILEGES ON *.* TO 'root'@'10.116.0.3' WITH GRANT OPTION;"
+echo "FLUSH PRIVILEGES;"
+echo "EXIT;"
 echo "------------------------------------------"
 
 echo "Setup Completed"
