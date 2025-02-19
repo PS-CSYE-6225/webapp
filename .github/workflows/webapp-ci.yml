@@ -10,6 +10,19 @@ jobs:
     name: Run Web App Tests
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+          MYSQL_PORT: ${{ secrets.DB_PORT }}
+          MYSQL_HOST: ${{ secrets.DB_HOST }}
+          MYSQL_USER: ${{ secrets.DB_USER }}
+          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+          - 3306:3306
+        
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -19,46 +32,22 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install MySQL
-        run: |
-          echo "Installing MySQL..."
-          sudo apt-get update
-          sudo apt-get install -y mysql-server
-          sudo systemctl start mysql
-
-      - name: Configure MySQL Root User
-        run: |
-          echo "Configuring MySQL Root User..."
-          sudo mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${{ secrets.DB_PASSWORD }}'; FLUSH PRIVILEGES;"
-          sudo mysql -u root -p"${{ secrets.DB_PASSWORD }}" -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_NAME }};"
-          sudo systemctl restart mysql
-
       - name: Load Environment Variables
-        run: |
-          echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
-          echo "DB_USER=root" >> $GITHUB_ENV
+        run: 
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
           echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
-          echo "DB_PORT=3306" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
 
       - name: Wait for MySQL to be Ready
         run: |
           echo "Waiting for MySQL to start..."
-          for i in {1..30}; do
-            if mysqladmin ping --host=127.0.0.1 --user="root" --password="$DB_PASSWORD" --silent; then
-              echo "MySQL is ready!"
-              exit 0
-            fi
-            echo "Waiting for MySQL..."
-            sleep 5
-          done
-          echo "MySQL did not start in time."
-          exit 1
+          sleep 20
+          mysql --host=localhost --port=3306 --user=${{ secrets.DB_USER }} --password=${{ secrets.DB_PASSWORD }} -e "SHOW DATABASES;"
 
       - name: Install Dependencies
         run: npm install
-
-      
 
       - name: Run Tests
         run: npm test
