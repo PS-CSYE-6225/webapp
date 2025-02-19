@@ -12,10 +12,12 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.0
+        image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+          MYSQL_PORT: ${{ secrets.DB_PORT }}
+          MYSQL_HOST: ${{ secrets.DB_HOST }}
           MYSQL_USER: ${{ secrets.DB_USER }}
           MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
@@ -31,12 +33,12 @@ jobs:
           node-version: '18'
 
       - name: Load Environment Variables
-        run: |
-          echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
+        run: 
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
           echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
           echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
-          echo "DB_PORT=3306" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
 
       - name: Wait for MySQL to be Ready
         run: |
