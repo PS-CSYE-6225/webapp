@@ -3,7 +3,7 @@ name: Web App CI
 on:
   pull_request:
     branches:
-      - main  # Runs on every pull request to the main branch
+      - main
 
 jobs:
   run-tests:
@@ -20,7 +20,7 @@ jobs:
           MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 3306:3306
-       
+        options: --health-cmd="mysqladmin ping -h 127.0.0.1 --user=$DB_USER --password=$DB_PASSWORD" --health-interval=10s --health-timeout=5s --health-retries=5
 
     steps:
       - name: Checkout Repository
@@ -43,8 +43,15 @@ jobs:
         run: |
           echo "Waiting for MySQL to start..."
           sleep 20
-          mysql --host=127.0.0.1 --port=3306 --user=${{ secrets.DB_USER }} --password=${{ secrets.DB_PASSWORD }} -e "ALTER USER '${{ secrets.DB_USER }}'@'%' IDENTIFIED WITH mysql_native_password BY '${{ secrets.DB_PASSWORD }}'; FLUSH PRIVILEGES;"
-          mysql --host=127.0.0.1 --port=3306 --user=${{ secrets.DB_USER }} --password=${{ secrets.DB_PASSWORD }} -e "SHOW DATABASES;"
+          until mysql --host=127.0.0.1 --port=3306 --user=$DB_USER --password=$DB_PASSWORD -e "SHOW DATABASES;"; do
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
+          echo "MySQL is ready."
+
+      - name: Ensure Correct Authentication Method
+        run: |
+          mysql --host=127.0.0.1 --port=3306 --user=root --password=$DB_PASSWORD -e "ALTER USER '$DB_USER'@'%' IDENTIFIED WITH mysql_native_password BY '$DB_PASSWORD'; FLUSH PRIVILEGES;"
 
       - name: Install Dependencies
         run: npm install
