@@ -43,3 +43,18 @@ Before you can build and run this application locally, make sure the following a
    - then it will check all the compatibility and successfull if there is no error 
    - Now sync main with the Fork file and create the pull request to update the local file
   
+  4. **Github Actions**
+   A GitHub repository with a Node.js web application.
+   The application should use MySQL as the database.
+   To securely store database credentials, set up GitHub Secrets:
+   Go to your GitHub repository.
+   Navigate to Settings → Secrets and Variables → Actions.
+   Click "New repository secret" and add:
+   This is the content of .env file to connect with mySQL
+   Write the content of env properly
+   DB_HOST
+   DB_USER
+   DB_PASSWORD
+   DB_NAME
+   DB_PORT
+
