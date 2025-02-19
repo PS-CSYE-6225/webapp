@@ -12,15 +12,18 @@ jobs:
 
     services:
       mysql:
-        image: mysql:latest
+        image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
-          MYSQL_USER: ${{ secrets.DB_USER }}
-          MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}  # ✅ Only use ROOT password
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}  # ✅ Creates your test database
         ports:
           - 3306:3306
-        
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --user=root --password=$DB_PASSWORD" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=10
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -31,25 +34,29 @@ jobs:
           node-version: '18'
 
       - name: Load Environment Variables
-        env:
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_PORT: ${{ secrets.DB_PORT }}
         run: |
-          echo "DB_HOST=$DB_HOST" >> .env
-          echo "DB_USER=$DB_USER" >> .env
-          echo "DB_PASSWORD=$DB_PASSWORD" >> .env
-          echo "DB_NAME=$DB_NAME" >> .env
-          echo "DB_PORT=$DB_PORT" >> .env
+          echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
+          echo "DB_USER=root" >> $GITHUB_ENV  # ✅ Use root user
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          echo "DB_PORT=3306" >> $GITHUB_ENV
 
+      - name: Wait for MySQL to be Ready
+        run: |
+          echo "Waiting for MySQL to start..."
+          sleep 30
+          until mysql --host=127.0.0.1 --port=3306 --user=root --password=$DB_PASSWORD -e "SHOW DATABASES;"; do
+            echo "Waiting for MySQL..."
+            sleep 5
+          done
+          echo "MySQL is ready."
+
+      - name: Ensure Correct Authentication Method
+        run: |
+          mysql --host=127.0.0.1 --port=3306 --user=root --password=$DB_PASSWORD -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '$DB_PASSWORD'; FLUSH PRIVILEGES;"
 
       - name: Install Dependencies
         run: npm install
-
-      - name: Wait for MySQL to Start
-        run: sleep 20
 
       - name: Run Tests
         run: npm test
