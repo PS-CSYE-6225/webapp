@@ -48,8 +48,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Wait for MySQL to Start
-        run: sleep 20
+    
 
       - name: Run Tests
         run: npm test
