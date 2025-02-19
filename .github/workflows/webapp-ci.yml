@@ -42,7 +42,7 @@ jobs:
         run: |
           echo "Waiting for MySQL to start..."
           sleep 20
-          mysql --host=127.0.0.1 --port=3306 --user=${{ secrets.DB_USER }} --password=${{ secrets.DB_PASSWORD }} -e "SHOW DATABASES;"
+          mysql --host=localhost --port=3306 --user=${{ secrets.DB_USER }} --password=${{ secrets.DB_PASSWORD }} -e "SHOW DATABASES;"
 
       - name: Install Dependencies
         run: npm install
