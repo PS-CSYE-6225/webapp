@@ -19,7 +19,7 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 --user=root --password=$DB_PASSWORD" 
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --user=$DB_USER --password=$DB_PASSWORD" 
           --health-interval=10s 
           --health-timeout=5s 
           --health-retries=10
@@ -35,17 +35,17 @@ jobs:
 
       - name: Load Environment Variables
         run: |
-          echo "DB_HOST=127.0.0.1" >> $GITHUB_ENV
-          echo "DB_USER=root" >> $GITHUB_ENV  
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}ot" >> $GITHUB_ENV  
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
           echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
-          echo "DB_PORT=3306" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
 
       - name: Wait for MySQL to be Ready
         run: |
           echo "Waiting for MySQL to start..."
           sleep 30
-          until mysql --host=127.0.0.1 --port=3306 --user=root --password=$DB_PASSWORD -e "SHOW DATABASES;"; do
+          until mysql --host=127.0.0.1 --port=3306 --user=$DB_USER --password=$DB_PASSWORD -e "SHOW DATABASES;"; do
             echo "Waiting for MySQL..."
             sleep 5
           done
