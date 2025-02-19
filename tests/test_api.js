@@ -58,21 +58,14 @@ describe("Health Check API Tests", () => {
 
     });
 
-   /* it("should return 503 Service Unavailable when DB is not reachable", async () => {
-        jest.spyOn(app.locals.sequelize, 'authenticate').mockRejectedValue(new Error("Database Down"));
-
-        await request(app)
-            .get("/healthz")
-            .expect(503);
-    });*/
     
     //  Should return 503 Service Unavailable when DB is not reachable
     it("should return 503 Service Unavailable when DB is not reachable", async () => {
-        //  Mock `HealthCheck.create()` to simulate a database error
+       //   Mock `HealthCheck.create()` to simulate a database error
         jest.spyOn(app.locals.sequelize.models.HealthCheck, 'create').mockRejectedValue(new Error("Database Down"));
     
         await request(app)
-            .get("/healthz")
+           .get("/healthz")
             .expect(503);
     });
     
