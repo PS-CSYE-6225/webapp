@@ -20,10 +20,7 @@ jobs:
           MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --host=localhost --user=root --password=root123"
-          --health-interval=10s --health-timeout=5s --health-retries=5
-
+        
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -47,8 +44,7 @@ jobs:
           echo "DB_NAME=$DB_NAME" >> .env
           echo "DB_PORT=$DB_PORT" >> .env
 
-      - name: Debug Environment Variables (Optional)
-        run: cat .env  # Check if secrets are properly stored in .env
+     
 
       - name: Install Dependencies
         run: npm install
