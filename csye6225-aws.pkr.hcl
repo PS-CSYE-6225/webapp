@@ -107,7 +107,7 @@ source "amazon-ebs" "ubuntu" {
   }
 
 
-
+  
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
     volume_size           = 25
@@ -119,14 +119,15 @@ source "amazon-ebs" "ubuntu" {
 build {
   sources = ["source.amazon-ebs.ubuntu"]
 
-  provisioner "shell" {
-    script = "setup.sh"
 
+   provisioner "shell" {
+
+    script = "setup.sh"
   }
 
   provisioner "file" {
     source      = "webapp.zip"
-    destination = "/tmp/webapp.zip"
+    destination = "/tmp/"
   }
 
   provisioner "file" {
@@ -135,11 +136,17 @@ build {
   }
 
   provisioner "file" {
-    source      = "./.env"
+    source      = ".env"
     destination = "/tmp/.env"
+    generated   = true
   }
 
+
+  
+
   provisioner "shell" {
+    
     script = "init-app.sh"
   }
+
 }
