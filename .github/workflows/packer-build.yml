@@ -151,14 +151,43 @@ jobs:
 
 
 
-   
+    - name: Retrieve Latest AMI ID and Save to File
+      run: |
+          AMI_ID=$(aws ec2 describe-images \
+            --owners self \
+            --filters "Name=state,Values=available" \
+            --query "Images | sort_by(@, &CreationDate)[-1].ImageId" \
+            --output text --region "$AWS_REGION")
 
-    - name: Upload AMI_ID Artifact
+          if [ -n "$AMI_ID" ]; then
+            echo "Found latest AMI: $AMI_ID"
+            echo "$AMI_ID" > ami_id.txt
+            echo "::set-output name=ami_id::$AMI_ID"
+          else
+            echo "No AMI found, exiting..."
+            exit 1
+          fi
+     
+
+    - name: Verify ami_id.txt Exists
+      run: |
+          if [ -f "ami_id.txt" ]; then
+            echo "ami_id.txt found, proceeding to upload..."
+          else
+            echo "ami_id.txt not found! Workflow will fail."
+            exit 1
+          fi
+     
+
+    - name: Upload AMI ID Artifact
       uses: actions/upload-artifact@v4
       with:
           name: ami_id
           path: ami_id.txt
-    
+          if-no-files-found: error
+          compression-level: 6
+          overwrite: true
+      
       
     - name: Configure AWS CLI for Dev/Demo Account
       run: |
