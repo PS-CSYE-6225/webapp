@@ -143,7 +143,7 @@ source "amazon-ebs" "ubuntu" {
 
 source "googlecompute" "gcp_image" {
   project_id       = var.gcp_project_id
-  source_image     = "ubuntu-os-cloud/ubuntu-2004-lts"
+  source_image     = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2004-lts"
   image_name       = "webami-gcp-${local.timestamp}"
   machine_type     = "e2-medium"
   zone             = var.gcp_zone
