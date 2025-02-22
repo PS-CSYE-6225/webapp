@@ -100,12 +100,6 @@ jobs:
         fi
         echo "AWS CLI Version:"
         aws --version
-
-    - name: Authenticate with Google Cloud
-      uses: google-github-actions/auth@v2
-      with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
       
     - name: Install GCP CLI
       run: |
@@ -231,7 +225,10 @@ jobs:
     - name: Authenticate with Google Cloud
       uses: google-github-actions/auth@v2
       with:
-              credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          create_credentials_file: true
+          export_environment_variables: true
+          cleanup_credentials: true
     
     - name: Save GCP Image ID
       run: |
