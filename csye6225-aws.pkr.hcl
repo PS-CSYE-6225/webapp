@@ -121,13 +121,14 @@ build {
 
 
    provisioner "shell" {
-
-    script = "setup.sh"
+      script = "setup.sh"
   }
+
 
   provisioner "file" {
     source      = "webapp.zip"
     destination = "/tmp/"
+    generated   = true
   }
 
   provisioner "file" {
