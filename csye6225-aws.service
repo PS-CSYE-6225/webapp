@@ -1,0 +1,17 @@
+[Unit]
+Description=Node.js Application
+After=network.target
+
+[Service]
+Type=simple
+User=cloudwebappuser
+Group=cloudwebappgroup
+WorkingDirectory=/opt/webapp
+ExecStart=/usr/bin/node /opt/webapp/index.js
+Restart=always
+RestartSec=3
+StandardOutput=append:/var/log/webapp.log
+StandardError=append:/var/log/webapp.log
+
+[Install]
+WantedBy=multi-user.target
