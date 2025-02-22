@@ -120,56 +120,41 @@ jobs:
     - name: Install plugins
       run: packer init csye6225-aws.pkr.hcl
 
-    - name: Validate Packer Template
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        DB_NAME: ${{ secrets.DB_NAME }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_PORT: ${{ secrets.DB_PORT }}
-        VPC_ID: ${{ secrets.VPC_ID }}
-        SUBNET_ID: ${{ secrets.SUBNET_ID }}
-        DEV_USER: ${{ secrets.DEV_USER }}
-        DEMO_USER: ${{ secrets.DEMO_USER }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-        
+    - name: Validate Packer Template  
       run: |
-        packer validate \
-        -var "VPC_ID=${{secrets.VPC_ID}}" \
-        -var "SUBNET_ID=${{secrets.SUBNET_ID}}" \
-        -var "DB_USER=${{secrets.DB_USER}}" \
-        -var "DB_PASSWORD=${{secrets.DB_PASSWORD}}" \
-        -var "DB_NAME=${{secrets.DB_NAME}}" \
-        -var "DEMO_USER=${{secrets.DEMO_USER}}" \
-        -var "DEV_USER=${{secrets.DEV_USER}}" \
-        csye6225-aws.pkr.hcl
+        packer validate csye6225-aws.pkr.hcl
 
     - name: Build Packer Image
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        DB_NAME: ${{ secrets.DB_NAME }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_PORT: ${{ secrets.DB_PORT }}
-        VPC_ID: ${{ secrets.VPC_ID }}
-        SUBNET_ID: ${{ secrets.SUBNET_ID }}
-        DEV_USER: ${{ secrets.DEV_USER }}
-        DEMO_USER: ${{ secrets.DEMO_USER }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
+      
       run: |
-        packer build \
-        -var "VPC_ID=${{secrets.VPC_ID}}" \
-        -var "SUBNET_ID=${{secrets.SUBNET_ID}}" \
-        -var "DB_USER=${{secrets.DB_USER}}" \
-        -var "DB_PASSWORD=${{secrets.DB_PASSWORD}}" \
-        -var "DB_NAME=${{secrets.DB_NAME}}" \
-        -var "DEMO_USER=${{secrets.DEMO_USER}}" \
-        -var "DEV_USER=${{secrets.DEV_USER}}" \
-        csye6225-aws.pkr.hcl
+        packer build csye6225-aws.pkr.hcl
+
+    - name: Share the AMI and Save AMI_ID
+      id: share_ami
+      run: |
+          AMI_ID=$(aws ec2 describe-images \
+              --owners self \
+              --filters "Name=state,Values=available" \
+              --query "Images | sort_by(@, &CreationDate)[-1].ImageId" \
+              --output text)
+
+          if [ -n "$AMI_ID" ]; then
+            echo "Sharing AMI $AMI_ID with DEMO account..."
+            aws ec2 modify-image-attribute --image-id "$AMI_ID" \
+              --launch-permission "{\"Add\": [{\"UserId\": \"${{ secrets.DEMO_USER }}\"}]}"
+            echo "::set-output name=ami_id::$AMI_ID"
+            echo "$AMI_ID" > ami_id.txt
+          else
+            echo "AMI not found, exiting."
+            exit 1
+          fi
+
+    - name: Upload AMI_ID Artifact
+      uses: actions/upload-artifact@v3
+      with:
+          name: ami_id
+          path: ami_id.txt
+      
       
     - name: Configure AWS CLI for Dev/Demo Account
       run: |
