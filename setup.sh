@@ -31,7 +31,7 @@ EOF
 # Create .env file
 echo "Creating .env file..."
 sudo bash -c 'cat > /opt/webapp/.env <<EOF
-DB_HOST=127.0.0.1
+DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=root123
 DB_NAME=CloudWebAppcsye625
@@ -52,7 +52,7 @@ sudo unzip /opt/webapp.zip -d /opt/webapp
 #sudo chown -R csye6225:csye6225 /opt/webapp
 sudo chown csye6225:csye6225 /opt/webapp/.env
 sudo npm install
-sudo chown csye6225:csye6225 node_modules
+
 
 sudo mkdir -p /opt/webapp/logs
 sudo chown -R csye6225:csye6225 /opt/webapp/logs

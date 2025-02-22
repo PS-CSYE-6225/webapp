@@ -47,7 +47,7 @@ jobs:
 
       - name: Create webapp.zip from existing directory
         run: |
-          zip -r webapp.zip .
+          zip -r webapp.zip . 
         shell: bash
       
       - name: Format packer

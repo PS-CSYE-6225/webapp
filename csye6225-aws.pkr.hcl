@@ -107,7 +107,7 @@ source "amazon-ebs" "ubuntu" {
   }
 
 
-  # ✅ Correct Placement of Block Device Mapping
+
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
     volume_size           = 25
@@ -119,14 +119,16 @@ source "amazon-ebs" "ubuntu" {
 build {
   sources = ["source.amazon-ebs.ubuntu"]
 
+
   provisioner "shell" {
     script = "setup.sh"
-
   }
+
 
   provisioner "file" {
     source      = "webapp.zip"
     destination = "/tmp/"
+    generated   = true
   }
 
   provisioner "file" {
@@ -134,7 +136,18 @@ build {
     destination = "/tmp/"
   }
 
+  provisioner "file" {
+    source      = ".env"
+    destination = "/tmp/.env"
+    generated   = true
+  }
+
+
+
+
   provisioner "shell" {
+
     script = "init-app.sh"
   }
+
 }
