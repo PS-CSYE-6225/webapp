@@ -142,13 +142,13 @@ source "amazon-ebs" "ubuntu" {
 }
 
 source "googlecompute" "gcp_image" {
-  project_id       = var.gcp_project_id
-  source_image     = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2004-lts"
-  image_name       = "webami-gcp-${local.timestamp}"
-  machine_type     = "e2-medium"
-  zone             = var.gcp_zone
-  credentials_file = var.gcp_credentials
-  ssh_username     = "ubuntu"
+  project_id          = var.gcp_project_id
+  source_image_family = "ubuntu-2004-lts"
+  image_name          = "webami-gcp-${local.timestamp}"
+  machine_type        = "e2-medium"
+  zone                = var.gcp_zone
+  credentials_file    = var.gcp_credentials
+  ssh_username        = "ubuntu"
 }
 
 build {
