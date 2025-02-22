@@ -60,5 +60,5 @@ Before you can build and run this application locally, make sure the following a
 
    helloo packer
    hello 
-   hello
+   
 
