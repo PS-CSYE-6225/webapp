@@ -1,17 +1,19 @@
 [Unit]
-Description=Node.js Application
+Description = Node.js Application
+ConditionPathExists=/opt/webapp/.env
 After=network.target
 
 [Service]
 Type=simple
-User=cloudwebappuser
-Group=cloudwebappgroup
+User=csye6225
+Group=csye6225
 WorkingDirectory=/opt/webapp
 ExecStart=/usr/bin/node /opt/webapp/index.js
 Restart=always
 RestartSec=3
-StandardOutput=append:/var/log/webapp.log
-StandardError=append:/var/log/webapp.log
+StandardOutput=append:/opt/webapp/logs/csye6225.log
+StandardError=append:/opt/webapp/logs/csye6225.log
+SyslogIdentifier=csye6225
 
 [Install]
 WantedBy=multi-user.target

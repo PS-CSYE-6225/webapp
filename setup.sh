@@ -1,15 +1,11 @@
 #!/bin/bash
 
-export DEBIAN_FRONTEND=noninteractive
 sudo apt-get update -y
+sudo apt-get install -y unzip
+sudo apt install -y curl
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - 
+sudo apt install -y nodejs
 sudo apt-get install -y mysql-server
-
-
-# Upgrade system packages
-echo "Upgrading system packages..."
-sudo apt upgrade -y
-
-
 
 # Configure MySQL to allow remote connections
 sudo sed -i 's/^bind-address\s*=.*/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
@@ -32,44 +28,6 @@ FLUSH PRIVILEGES;
 EXIT;
 EOF
 
-# Create Linux Group and User
-echo "Creating Linux Group..."
-sudo groupadd cloudwebappgroup || echo "Group already exists."
-
-echo "Creating Linux User..."
-sudo useradd -m -g cloudwebappgroup cloudwebappuser || echo "User already exists."
-
-# Install Dependencies
-echo "Installing dependencies..."
-sudo apt install -y unzip curl
-
-# Install Node.js
-echo "Installing Node.js..."
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# Create Application Directory
-echo "Creating application directory..."
-sudo mkdir -p /opt/webapp
-sudo chown -R cloudwebappuser:cloudwebappgroup /opt/webapp
-
-# Copy and Extract Web App
-echo "Unzipping application..."
-sudo mv /tmp/csye6225-aws.service /etc/systemd/system
-sudo unzip /tmp/webapp.zip -d /opt/webapp
-sudo mv /tmp/.env /opt/webapp
-
-node -v
-npm -v
-
-   # Create and Set ownership csye6225 user with no login shell
-sudo useradd -r -s /usr/sbin/nologin -m cloudwebappuser
-sudo chown -R cloudwebappuser:cloudwebappgroup /tmp/webapp.zip
-# Set Permissions
-echo "Updating permissions..."
-sudo chown -R cloudwebappuser:cloudwebappgroup /opt/webapp
-sudo chmod -R 755 /opt/webapp
-
 # Create .env file
 echo "Creating .env file..."
 sudo bash -c 'cat > /opt/webapp/.env <<EOF
@@ -82,17 +40,20 @@ NODE_ENV=production
 EOF
 '
 
-sudo chmod 600 /opt/webapp/.env
-sudo chown cloudwebappuser:cloudwebappgroup /opt/webapp/.env
+sudo node -v
+sudo npm -v
+sudo groupadd csye6225
+sudo useradd csye6225 --shell /usr/sbin/nologin -g csye6225
+sudo cp /tmp/csye6225-aws.service /etc/systemd/system/
+sudo cp /tmp/webapp.zip /opt/
+sudo unzip /opt/webapp.zip -d /opt/webapp
 
-# Install Node.js Dependencies
-echo "Installing Node.js dependencies..."
-cd /opt/webapp || exit 1
-if [ -f "package.json" ]; then
-    sudo -u cloudwebappuser npm install
-else
-    echo "ERROR: package.json is missing. Cannot install dependencies."
-    exit 1
-fi
 
-echo "Setup Completed"
+#sudo chown -R csye6225:csye6225 /opt/webapp
+sudo chown csye6225:csye6225 /opt/webapp/.env
+sudo npm install
+sudo chown csye6225:csye6225 node_modules
+
+sudo mkdir -p /opt/webapp/logs
+sudo chown -R csye6225:csye6225 /opt/webapp/logs
+

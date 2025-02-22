@@ -126,13 +126,12 @@ build {
 
   provisioner "file" {
     source      = "webapp.zip"
-    destination = "/tmp/webapp.zip"
-    generated   = true
+    destination = "/tmp/"
   }
 
   provisioner "file" {
     source      = "./csye6225-aws.service"
-    destination = "/tmp/csye6225-aws.service"
+    destination = "/tmp/"
   }
 
   provisioner "shell" {
