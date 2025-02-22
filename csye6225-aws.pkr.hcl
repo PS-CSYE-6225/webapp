@@ -102,7 +102,7 @@ variable "gcp_zone" {
 
 variable "gcp_credentials" {
   type    = string
-  default = "C:\\packer\\gcp-packer-key.json"
+  default = "./gcp-packer-key.json"
 }
 
 variable "ami_name_gcp" {
