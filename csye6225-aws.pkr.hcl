@@ -102,7 +102,7 @@ variable "gcp_zone" {
 
 variable "gcp_credentials" {
   type    = string
-  default = "C:/Users/pshah/OneDrive/Desktop/Netowrking and cloud computing Assignment/gcp-packer-key.json"
+  default = "C:\\packer\\gcp-packer-key.json"
 }
 
 variable "ami_name_gcp" {
@@ -147,7 +147,7 @@ source "googlecompute" "gcp_image" {
   image_name       = "webami-gcp-${local.timestamp}"
   machine_type     = "e2-medium"
   zone             = var.gcp_zone
-  credentials_json = file(var.gcp_credentials)
+  credentials_file = var.gcp_credentials
   ssh_username     = "ubuntu"
 }
 
