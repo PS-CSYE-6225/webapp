@@ -116,6 +116,14 @@ jobs:
           sudo apt-get install -y google-cloud-sdk
           gcloud auth configure-docker
 
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          create_credentials_file: true
+          export_environment_variables: true
+          cleanup_credentials: true
+
 
     - name: Check and Install Packer
       run: |
@@ -231,13 +239,7 @@ jobs:
           compression-level: 6
           overwrite: true
       
-    - name: Authenticate with Google Cloud
-      uses: google-github-actions/auth@v2
-      with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-          create_credentials_file: true
-          export_environment_variables: true
-          cleanup_credentials: true
+    
     
     - name: Save GCP Image ID
       run: |
