@@ -58,5 +58,5 @@ jobs:
         
       - name: Validate Packer
         run: |
-          packer validatecsye6225-aws.pkr.hcl
+          packer validate csye6225-aws.pkr.hcl
         shell: bash
