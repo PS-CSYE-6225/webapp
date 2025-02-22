@@ -14,23 +14,14 @@ variable "aws_region" {
 
 variable "ssh_username" {
   type    = string
-  default = env("SSH_USERNAME")
-}
-
-variable "vpc_id" {
-  type    = string
-  default = env("VPC_ID")
-}
-
-variable "subnet_id" {
-  type    = string
-  default = env("SUBNET_ID")
+  default = "ubuntu" 
 }
 
 variable "instance_type" {
   type    = string
-  default = env("INSTANCE_TYPE")
+  default = "t2.micro" 
 }
+
 
 variable "access_key" {
   type    = string
@@ -63,7 +54,7 @@ variable "host" {
 }
 
 variable "port" {
-  type    = number
+  type    = string
   default = env("DB_PORT")
 }
 
