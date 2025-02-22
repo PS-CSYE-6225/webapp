@@ -106,7 +106,7 @@ variable "gcp_credentials" {
 }
 
 variable "ami_name_gcp" {
-  default = "webami"  
+  default = "webami"
 }
 
 
@@ -142,11 +142,11 @@ source "amazon-ebs" "ubuntu" {
 }
 
 source "googlecompute" "gcp_image" {
-  project_id   = var.gcp_project_id
-  source_image = "ubuntu-2004-lts"
-  image_name   = "webami-gcp-${local.timestamp}"
-  machine_type = "e2-medium"
-  zone         = var.gcp_zone
+  project_id       = var.gcp_project_id
+  source_image     = "ubuntu-2004-lts"
+  image_name       = "webami-gcp-${local.timestamp}"
+  machine_type     = "e2-medium"
+  zone             = var.gcp_zone
   credentials_json = file(var.gcp_credentials)
   ssh_username     = "ubuntu"
 }
