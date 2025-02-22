@@ -14,12 +14,12 @@ variable "aws_region" {
 
 variable "ssh_username" {
   type    = string
-  default = "ubuntu" 
+  default = "ubuntu"
 }
 
 variable "instance_type" {
   type    = string
-  default = "t2.micro" 
+  default = "t2.micro"
 }
 
 
@@ -90,16 +90,16 @@ locals {
 
 
 source "amazon-ebs" "ubuntu" {
-  ami_name        = "${var.ami_name}-${local.timestamp}"
-  instance_type   = var.instance_type
-  region          = var.aws_region
-  access_key      = var.access_key
-  secret_key      = var.secret_key
-  source_ami      = "ami-04b4f1a9cf54c11d0"  
-  ssh_username = var.ssh_username
-  subnet_id       = var.subnet_id
-  vpc_id          = var.vpc_id
-  ami_users       = [var.dev_user, var.demo_user]
+  ami_name      = "${var.ami_name}-${local.timestamp}"
+  instance_type = var.instance_type
+  region        = var.aws_region
+  access_key    = var.access_key
+  secret_key    = var.secret_key
+  source_ami    = "ami-04b4f1a9cf54c11d0"
+  ssh_username  = var.ssh_username
+  subnet_id     = var.subnet_id
+  vpc_id        = var.vpc_id
+  ami_users     = [var.dev_user, var.demo_user]
 
   tags = {
     Name        = "webAMI"

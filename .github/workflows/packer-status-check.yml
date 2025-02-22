@@ -52,11 +52,11 @@ jobs:
       
       - name: Format packer
         run: |
-          packer fmt -check .
+          packer fmt -check csye6225-aws.pkr.hcl
         continue-on-error: false
         shell: bash
         
       - name: Validate Packer
         run: |
-          packer validate .
+          packer validate csye6225-aws.pkr.hcl
         shell: bash
