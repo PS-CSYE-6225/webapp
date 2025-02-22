@@ -33,27 +33,27 @@ variable "secret_key" {
   default = env("AWS_SECRET_ACCESS_KEY")
 }
 
-variable "database" {
+variable "db_name" {
   type    = string
   default = env("DB_NAME")
 }
 
-variable "user" {
+variable "db_user" {
   type    = string
   default = env("DB_USER")
 }
 
-variable "password" {
+variable "db_password" {
   type    = string
   default = env("DB_PASSWORD")
 }
 
-variable "host" {
+variable "db_host" {
   type    = string
   default = env("DB_HOST")
 }
 
-variable "port" {
+variable "db_port" {
   type    = string
   default = env("DB_PORT")
 }
