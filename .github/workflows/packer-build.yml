@@ -151,23 +151,37 @@ jobs:
 
 
 
-    - name: Retrieve Latest AMI ID and Save to File
+    - name: Retrieve Latest AMI and Save AMI_ID
+      id: share_ami
       run: |
+          # Ensure AWS_REGION is set
+          AWS_REGION=${{ secrets.AWS_REGION }}
+          
+          # Retrieve the latest AMI ID
           AMI_ID=$(aws ec2 describe-images \
             --owners self \
             --filters "Name=state,Values=available" \
             --query "Images | sort_by(@, &CreationDate)[-1].ImageId" \
             --output text --region "$AWS_REGION")
-
-          if [ -n "$AMI_ID" ]; then
-            echo "Found latest AMI: $AMI_ID"
+      
+          if [[ -n "$AMI_ID" && "$AMI_ID" != "None" ]]; then
+            echo "✅ Found latest AMI: $AMI_ID"
+            
+            # Share AMI with the DEMO account
+            aws ec2 modify-image-attribute --image-id "$AMI_ID" \
+              --launch-permission "{\"Add\": [{\"UserId\": \"${{ secrets.DEMO_USER }}\"}]}" \
+              --region "$AWS_REGION"
+            
+            # Save AMI_ID in an environment variable for later steps
+            echo "AMI_ID=$AMI_ID" >> $GITHUB_ENV
+      
+            # Save AMI_ID to a file
             echo "$AMI_ID" > ami_id.txt
-            echo "::set-output name=ami_id::$AMI_ID"
           else
-            echo "No AMI found, exiting..."
+            echo "❌ No AMI found, exiting..."
             exit 1
           fi
-     
+ 
 
     - name: Verify ami_id.txt Exists
       run: |
