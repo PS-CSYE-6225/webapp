@@ -4,6 +4,13 @@ packer {
       version = ">= 1.2.8, <2.0.0"
       source  = "github.com/hashicorp/amazon"
     }
+
+    googlecompute = {
+
+      version = ">= 1.0.0, <2.0.0"
+      source  = "github.com/hashicorp/googlecompute"
+    }
+
   }
 }
 
@@ -83,6 +90,26 @@ variable "demo_user" {
   default = env("DEMO_USER")
 }
 
+variable "gcp_project_id" {
+  type    = string
+  default = "gcp-packer-451719"
+}
+
+variable "gcp_zone" {
+  type    = string
+  default = "us-central1-a"
+}
+
+variable "gcp_credentials" {
+  type    = string
+  default = "C:/Users/pshah/OneDrive/Desktop/Netowrking and cloud computing Assignment/gcp-packer-key.json"
+}
+
+variable "ami_name_gcp" {
+  default = "webami"  
+}
+
+
 locals {
   ami_description = "Image for webapp"
   timestamp       = regex_replace(timestamp(), "[- TZ:]", "")
@@ -106,8 +133,6 @@ source "amazon-ebs" "ubuntu" {
     Environment = "dev"
   }
 
-
-
   launch_block_device_mappings {
     device_name           = "/dev/sda1"
     volume_size           = 25
@@ -116,8 +141,18 @@ source "amazon-ebs" "ubuntu" {
   }
 }
 
+source "googlecompute" "gcp_image" {
+  project_id   = var.gcp_project_id
+  source_image = "ubuntu-2004-lts"
+  image_name   = "webami-gcp-${local.timestamp}"
+  machine_type = "e2-medium"
+  zone         = var.gcp_zone
+  credentials_json = file(var.gcp_credentials)
+  ssh_username     = "ubuntu"
+}
+
 build {
-  sources = ["source.amazon-ebs.ubuntu"]
+  sources = ["source.amazon-ebs.ubuntu", "source.googlecompute.gcp_image"]
 
 
   provisioner "shell" {

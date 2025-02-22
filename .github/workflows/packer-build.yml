@@ -18,6 +18,8 @@ jobs:
           DB_NAME: ${{secrets.DB_NAME}}
           DB_USER: ${{secrets.DB_USER}}
           DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
         ports:
           - 3306:3306
         options: >-
@@ -99,6 +101,17 @@ jobs:
         echo "AWS CLI Version:"
         aws --version
 
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      
+    - name: Install GCP CLI
+      run: |
+          sudo apt-get update
+          sudo apt-get install -y google-cloud-sdk
+          gcloud auth configure-docker
 
 
     - name: Check and Install Packer
@@ -138,6 +151,8 @@ jobs:
         DEV_USER: ${{ secrets.DEV_USER }}
         DEMO_USER: ${{ secrets.DEMO_USER }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
+        GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
       run: |
        packer build \
         -var "vpc_id=${{ secrets.VPC_ID }}" \
@@ -156,7 +171,10 @@ jobs:
       with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          
           aws-region: ${{ secrets.AWS_REGION }}
+          
+          
 
     - name: Verify AWS Credentials
       run: aws sts get-caller-identity
@@ -173,7 +191,7 @@ jobs:
             --output text --region "$AWS_REGION")
       
           if [[ -n "$AMI_ID" && "$AMI_ID" != "None" ]]; then
-            echo "✅ Found latest AMI: $AMI_ID"
+            echo "Found latest AMI: $AMI_ID"
             
             # Share AMI with the DEMO account
             aws ec2 modify-image-attribute --image-id "$AMI_ID" \
@@ -186,7 +204,7 @@ jobs:
             # Save AMI_ID to a file
             echo "$AMI_ID" > ami_id.txt
           else
-            echo "❌ No AMI found, exiting..."
+            echo "No AMI found, exiting..."
             exit 1
           fi
  
@@ -201,7 +219,7 @@ jobs:
           fi
      
 
-    - name: Upload AMI ID Artifact
+    - name: Upload AWS AMI ID Artifact
       uses: actions/upload-artifact@v4
       with:
           name: ami_id
@@ -210,6 +228,21 @@ jobs:
           compression-level: 6
           overwrite: true
       
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+              credentials_json: ${{ secrets.GCP_SA_KEY }}
+    
+    - name: Save GCP Image ID
+      run: |
+          GCP_IMAGE_ID=$(gcloud compute images list --filter="name~'packer-*'" --sort-by="~creationTimestamp" --limit=1 --format="value(NAME)")
+          echo "$GCP_IMAGE_ID" > gcp_image_id.txt
+
+    - name: Upload GCP AMI ID Artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: gcp_image_id
+          path: gcp_image_id.txt
       
     - name: Configure AWS CLI for Dev/Demo Account
       run: |
