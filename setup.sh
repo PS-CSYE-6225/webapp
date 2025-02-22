@@ -49,10 +49,10 @@ sudo cp /tmp/webapp.zip /opt/
 sudo unzip /opt/webapp.zip -d /opt/webapp
 
 
-#sudo chown -R csye6225:csye6225 /opt/webapp
-sudo chown csye6225:csye6225 /opt/webapp/.env
+sudo chown -R csye6225:csye6225 /opt/webapp
+sudo chown csye6225:csye6225 .env
 sudo npm install
-sudo chown csye6225:csye6225 node_modules
+
 
 sudo mkdir -p /opt/webapp/logs
 sudo chown -R csye6225:csye6225 /opt/webapp/logs

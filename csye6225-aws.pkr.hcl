@@ -134,7 +134,12 @@ build {
     destination = "/tmp/"
   }
 
-  provisioner "shell" {
+  provisioner "file" {
+  source      = "./.env"
+  destination = "/tmp/.env"
+}
+
+  /*provisioner "shell" {
     script = "init-app.sh"
-  }
+  }*/
 }
