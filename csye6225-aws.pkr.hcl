@@ -172,6 +172,7 @@ build {
     generated   = true
   }
 
+
   provisioner "shell" {
     script = "setup.sh"
   }
