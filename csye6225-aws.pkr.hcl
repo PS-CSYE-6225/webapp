@@ -162,14 +162,15 @@ build {
 
   provisioner "file" {
     source      = "webapp.zip"
-    destination = "/tmp/"
+    destination = "/tmp/webapp.zip"
     generated   = true
   }
 
   provisioner "file" {
     source      = "./csye6225-aws.service"
-    destination = "/tmp/"
+    destination = "/tmp/csye6225-aws.service"
   }
+
 
   provisioner "file" {
     source      = ".env"
