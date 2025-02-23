@@ -13,7 +13,7 @@ sudo sed -i 's/^bind-address\s*=.*/bind-address = 0.0.0.0/' /etc/mysql/mysql.con
 
 
 # Validate that secrets are available
-if [[ -z "$MYSQL_ROOT_PASSWORD" || -z "$MYSQL_USER" || -z "$MYSQL_PASSWORD" || -z "$MYSQL_DATABASE" || -z "$MYSQL_HOST" || -z "$MYSQL_PORT" ]]; then
+if [[ -z "$DB_USER" || -z "$DB_PASSWORD" || -z "$DB_NAME" || -z "$DB_HOST" || -z "$DB_PORT" ]]; then
   echo "Error: One or more MySQL secrets are missing in .env file."
   exit 1
 fi
@@ -31,9 +31,9 @@ sudo mysql -e "CREATE DATABASE IF NOT EXISTS CloudWebAppcsye625;"
 # Grant MySQL Access
 echo "Granting MySQL access..."
 sudo mysql -u root -p <<EOF
-ALTER USER '${DB_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_PASSWORD}';
-CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_PASSWORD}';
-GRANT ALL PRIVILEGES ON *.* TO '${DB_USER}'@'localhost' WITH GRANT OPTION;
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_PASSWORD}';
+CREATE USER IF NOT EXISTS 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '${DB_PASSWORD}';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 EXIT;
 EOF
@@ -41,8 +41,8 @@ EOF
 # Create .env file
 echo "Creating .env file..."
 sudo bash -c 'cat > /opt/webapp/.env <<EOF
-DB_HOST=${DB_HOST}
-DB_USER=${DB_USER}
+DB_HOST=localhost
+DB_USER=root
 DB_PASSWORD=${DB_PASSWORD}
 DB_NAME=${DB_NAME}
 DB_PORT=${DB_PORT}
