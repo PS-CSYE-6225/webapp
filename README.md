@@ -58,7 +58,68 @@ Before you can build and run this application locally, make sure the following a
    DB_NAME
    DB_PORT
 
-   helloo packer
-   hello hello
+ 5. **Packer**
+   For AWS
+  Install AWS CLI (aws configure)
+  IAM user with EC2 and AMI permissions
+  AWS access key and secret key
+
+For GCP
+  Install Google Cloud SDK (gcloud init)
+  Service account with Compute Image User and Compute Instance Admin roles
+  Authenticate using gcloud auth application-default login
+
+3. Installing Packer
+Download Packer from HashiCorp’s official website.
+Install Packer based on your OS:
+Windows: Run the .exe installer.
+
+packer --version
+1. Setting Up Packer for AWS
+Configure AWS CLI:
+sh
+Copy
+Edit
+aws configure
+Provide:
+AWS Access Key ID
+AWS Secret Access Key
+Region (e.g., us-east-1)
+Create an IAM Role with:
+EC2 Full Access
+AMI Creation Permissions
+Attach the IAM role to an EC2 instance or use environment variables.
+5. Setting Up Packer for GCP
+Authenticate using Google Cloud SDK:
+sh
+Copy
+Edit
+gcloud auth application-default login
+Enable necessary APIs in GCP Console:
+Compute Engine API
+IAM API
+Create a Service Account and assign roles:
+Compute Image User
+Compute Instance Admin
+Download and store the JSON key file securely.
+6. Running Packer
+Initialize Packer:
+sh
+Copy
+Edit
+packer init .
+Validate Packer template:
+sh
+Copy
+Edit
+packer validate template.pkr.hcl
+Build the image:
+sh
+Copy
+Edit
+packer build template.pkr.hcl
+Check the image in AWS/GCP Console:
+AWS: Navigate to EC2 → AMIs
+GCP: Navigate to Compute Engine → Images
    
 
