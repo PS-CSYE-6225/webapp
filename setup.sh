@@ -43,20 +43,31 @@ EOF
 sudo node -v
 sudo npm -v
 
-sudo groupadd csye6225
+sudo mkdir -p /opt/webapp
+sudo chmod 755 /opt/webapp
+
+if [ ! -f "/tmp/webapp.zip" ]; then
+    echo "❌ Error: webapp.zip is missing in /tmp/"
+    exit 1
+fi
+
+echo "Unzipping webapp.zip..."
+sudo unzip /tmp/webapp.zip -d /opt/webapp
+
 
 sudo mv /tmp/csye6225-aws.service /etc/systemd/system/
-sudo unzip /tmp/webapp.zip -d /opt/webapp
-sudo mv /tmp/.env /opt/webapp
+sudo mv /tmp/.env /opt/webapp/.env
 
-
-sudo useradd -r -s /usr/sbin/nologin -m csye6225
-sudo chown -R csye6225:csye6225 /tmp/webapp.zip
+sudo groupadd -f csye6225
+sudo useradd -r -s /usr/sbin/nologin -g csye6225 -m csye6225 
+sudo chown -R csye6225:csye6225 /opt/webapp
 
 sudo chown -R csye6225:csye6225 /opt/webapp
 sudo chown csye6225:csye6225 .env
 
+cd /opt/webapp || { echo "❌ Error: Failed to change directory to /opt/webapp"; exit 1; }
 sudo npm install
+
 
 #sudo chown -R csye6225:csye6225 /opt/webapp
 #sudo chown csye6225:csye6225 /opt/webapp/.env
