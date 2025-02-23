@@ -58,3 +58,4 @@ sudo npm install
 sudo mkdir -p /opt/webapp/logs
 sudo chown -R csye6225:csye6225 /opt/webapp/logs
 
+echo "Setup completed"

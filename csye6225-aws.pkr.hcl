@@ -155,11 +155,6 @@ build {
   sources = ["source.amazon-ebs.ubuntu", "source.googlecompute.gcp_image"]
 
 
-  provisioner "shell" {
-    script = "setup.sh"
-  }
-
-
   provisioner "file" {
     source      = "webapp.zip"
     destination = "/tmp/webapp.zip"
@@ -178,6 +173,10 @@ build {
     generated   = true
   }
 
+
+  provisioner "shell" {
+    script = "setup.sh"
+  }
 
 
 
