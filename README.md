@@ -74,6 +74,7 @@ Download Packer from HashiCorp’s official website.
 Install Packer based on your OS:
 Windows: Run the .exe installer.
 
+**Install packer**
 packer --version
 1. Setting Up Packer for AWS
 Configure AWS CLI:
