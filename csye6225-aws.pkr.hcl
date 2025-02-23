@@ -166,6 +166,7 @@ build {
     destination = "/tmp/csye6225-aws.service"
   }
 
+
   provisioner "file" {
     source      = ".env"
     destination = "/tmp/.env"
