@@ -7,7 +7,7 @@ curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo apt-get install -y mysql-server
 
- # Configure MySQL to allow remote connections
+# Configure MySQL to allow remote connections
 sudo sed -i 's/^bind-address\s*=.*/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
 
 # Restart MySQL service
@@ -42,40 +42,19 @@ EOF
 
 sudo node -v
 sudo npm -v
-
-sudo mkdir -p /opt/webapp
-sudo chmod 755 /opt/webapp
-
-if [ ! -f "/tmp/webapp.zip" ]; then
-    echo "❌ Error: webapp.zip is missing in /tmp/"
-    exit 1
-fi
-
-echo "Unzipping webapp.zip..."
-sudo unzip /tmp/webapp.zip -d /opt/webapp
-
-
-sudo mv /tmp/csye6225-aws.service /etc/systemd/system/
-sudo mv /tmp/.env /opt/webapp/.env
-
-sudo groupadd -f csye6225
-sudo useradd -r -s /usr/sbin/nologin -g csye6225 -m csye6225 
-sudo chown -R csye6225:csye6225 /opt/webapp
-
-sudo chown -R csye6225:csye6225 /opt/webapp
-sudo chown csye6225:csye6225 .env
-
-cd /opt/webapp || { echo "❌ Error: Failed to change directory to /opt/webapp"; exit 1; }
-sudo npm install
+sudo groupadd csye6225
+sudo useradd csye6225 --shell /usr/sbin/nologin -g csye6225
+sudo cp /tmp/csye6225-aws.service /etc/systemd/system/
+sudo cp /tmp/webapp.zip /opt/
+sudo unzip /opt/webapp.zip -d /opt/webapp
+sudo /tmp/.env /opt/webapp
 
 
 #sudo chown -R csye6225:csye6225 /opt/webapp
-#sudo chown csye6225:csye6225 /opt/webapp/.env
-#sudo npm install
-
-sudo chown -R csye6225:csye6225 /opt/webapp
-sudo chmod -R 755 /opt/webapp
+sudo chown csye6225:csye6225 /opt/webapp/.env
+sudo npm install
 
 
-
+sudo mkdir -p /opt/webapp/logs
+sudo chown -R csye6225:csye6225 /opt/webapp/logs
 
