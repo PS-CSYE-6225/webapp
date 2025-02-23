@@ -180,9 +180,9 @@ build {
 
 
 
-  provisioner "shell" {
+  /*provisioner "shell" {
 
     script = "init-app.sh"
-  }
+  }*/
 
 }

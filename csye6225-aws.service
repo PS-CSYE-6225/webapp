@@ -3,21 +3,13 @@ Description=Node.js Application
 ConditionPathExists=/opt/webapp/.env
 After=network.target
 
+
 [Service]
 Type=simple
 User=csye6225
 Group=csye6225
 WorkingDirectory=/opt/webapp
-
-# Ensure logs directory exists
-ExecStartPre=/bin/mkdir -p /opt/webapp/logs
-
-# Ensure .env file exists before starting
-ExecStartPre=/bin/bash -c 'test -f /opt/webapp/.env || { echo "❌ Missing .env file"; exit 1; }'
-
-# Start the Node.js application
 ExecStart=/usr/bin/node /opt/webapp/index.js
-
 Restart=always
 RestartSec=3
 StandardOutput=append:/opt/webapp/logs/csye6225.log
