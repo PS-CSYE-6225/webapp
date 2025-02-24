@@ -29,6 +29,7 @@ cd /opt/webapp || exit
 
 
 sudo useradd -g csye6225 -s /usr/sbin/nologin csye6225
+echo "csye6225 ALL=(ALL:ALL) NOPASSWD: /bin/systemctl" | sudo EDITOR='tee -a' visudo
 sudo chown -R csye6225:csye6225 /tmp/webapp.zip
 
       # Extract webapp and set up the systemd service
@@ -39,10 +40,8 @@ sudo npm install
 sudo chown csye6225:csye6225 node_modules
 
 
-echo "csye6225 ALL=(ALL:ALL) NOPASSWD: /bin/systemctl" | sudo EDITOR='tee -a' visudo
-sudo systemctl daemon-reload
-sudo systemctl enable csye6225-aws
-sudo systemctl restart csye6225-aws
+
+
 
 
 

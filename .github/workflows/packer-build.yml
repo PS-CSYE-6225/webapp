@@ -240,22 +240,7 @@ jobs:
           path: gcp_image_id.txt
 
 
-    - name: Create instance template
-      id: create-template
-      run: |
-          if [ ! -f /opt/webapp/.env ]; then
-                  sudo echo \"DB_HOST=${{secrets.DB_HOST}}\" | sudo tee -a /opt/webapp/.env
-                  sudo echo \"DB_PASSWORD=${{secrets.DB_PASSWORD}}\" | sudo tee -a /opt/webapp/.env
-                  sudo echo \"DB_NAME=${{secrets.DB_NAME}}\" | sudo tee -a /opt/webapp/.env
-                  sudo echo \"DB_USER=${{secrets.DB_USER}}\" | sudo tee -a /opt/webapp/.env
-                  sudo echo \"DB_PORT=${{secrets.DB_PORT}}\" | sudo tee -a /opt/webapp/.env
-                
-              fi
-              sudo touch /opt/start.txt
-              sudo chown -R csye6225:csye6225 /opt/webapp/
-              sudo chmod 700 /opt/webapp/" \
-              --quiet
-
+    
       
     - name: Configure AWS CLI for Dev/Demo Account
       run: |
