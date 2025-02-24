@@ -10,7 +10,6 @@ Type=simple
 User=csye6225
 Group=csye6225
 WorkingDirectory=/opt/webapp/
-ExecStartPre=/bin/bash -c "while [ ! -f /opt/start.txt ]; do sleep 1; done"
 EnvironmentFile=/opt/webapp/.env
 ExecStartPre=/usr/bin/npm install
 ExecStart=/usr/bin/node /opt/webapp/index.js
