@@ -31,6 +31,9 @@ FLUSH PRIVILEGES;
 EXIT;
 EOF
 
+sudo mkdir -p /opt/webapp
+sudo chmod 755 /opt/webapp
+
 # Create .env file with MySQL credentials
 echo "Creating .env file..."
 sudo cp /tmp/.env /opt/webapp/.env <<EOF
@@ -42,7 +45,8 @@ DB_PORT=3306
 NODE_ENV=production
 EOF
 
-sudo chmod 600 /opt/webapp/.env
+sudo chmod 644 /opt/webapp/.env
+sudo chown csye6225:csye6225 /opt/webapp/.env
 
 
 sudo cp /tmp/csye6225-aws.service /etc/systemd/system/
