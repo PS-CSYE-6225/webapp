@@ -28,7 +28,7 @@ sudo cp /tmp/.env /opt/webapp
 cd /opt/webapp || exit
 
 
-ssudo useradd -g csye6225 -s /usr/sbin/nologin csye6225
+sudo useradd -g csye6225 -s /usr/sbin/nologin csye6225
 sudo chown -R csye6225:csye6225 /tmp/webapp.zip
 
       # Extract webapp and set up the systemd service
