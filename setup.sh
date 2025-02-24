@@ -11,7 +11,6 @@ sudo npm -v
 npm install dotenv
 
 npm install express sequelize mysql2 dotenv
-sudo groupadd csye6225
 
 
 
@@ -24,7 +23,7 @@ sudo cp /tmp/.env /opt/webapp
 cd /opt/webapp || exit
 
 
-sudo useradd -r -s /usr/sbin/nologin -m csye6225
+sudo useradd -r -s /usr/sbin/nologin -m -g csye6225
 sudo chown -R csye6225:csye6225 /tmp/webapp.zip
 
       # Extract webapp and set up the systemd service
