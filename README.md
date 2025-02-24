@@ -123,4 +123,5 @@ Check the image in AWS/GCP Console:
 AWS: Navigate to EC2 → AMIs
 GCP: Navigate to Compute Engine → Images
    
+   hello 
 
