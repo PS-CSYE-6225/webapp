@@ -63,20 +63,12 @@ jobs:
     - name: Install Dependencies
       run: npm i
 
-    - name: Configure Environment Variables
+    - name: Set up MySQL
       run: |
-        echo DB_USER=${{ secrets.DB_USER }}
-        echo DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-        echo DB_NAME=${{ secrets.DB_NAME }}
-        echo DB_HOST=${{ secrets.DB_HOST }}
-        echo DB_PORT=${{ secrets.DB_PORT }}
+        sudo systemctl start mysql
+        mysql -u${{secrets.DB_USER}}  -p${{secrets.DB_PASSWORD}} -e "CREATE DATABASE IF NOT EXISTS ${{ secrets.DB_NAME }};" || exit 1
+        mysql -u${{secrets.DB_USER}}  -p${{secrets.DB_PASSWORD}} -e "USE ${{ secrets.DB_NAME }};" || exit 1
 
-    - name: Wait for MySQL
-      run: |
-        until mysqladmin ping -h "127.0.0.1" --silent; do
-          echo "Waiting for MySQL to be ready..."
-          sleep 5
-        done
 
     - name: Run Test
       run: npm test 
@@ -251,6 +243,24 @@ jobs:
       with:
           name: gcp_image_id
           path: gcp_image_id.txt
+
+
+    - name: Create instance template
+      id: create-template
+      run: |
+          if [ ! -f /opt/webapp/.env ]; then
+                  sudo echo \"DB_HOST=${{secrets.DB_HOST}}\" | sudo tee -a /opt/webapp/.env
+                  sudo echo \"DB_PASSWORD=${{secrets.DB_PASSWORD}}\" | sudo tee -a /opt/webapp/.env
+                  sudo echo \"DB_NAME=${{secrets.DB_NAME}}\" | sudo tee -a /opt/webapp/.env
+                  sudo echo \"DB_USER=${{secrets.DB_USER}}\" | sudo tee -a /opt/webapp/.env
+                  sudo echo \"DB_PORT=${{secrets.DB_PORT}}\" | sudo tee -a /opt/webapp/.env
+                
+              fi
+              sudo touch /opt/start.txt
+              sudo chown -R csye6225:csye6225 /opt/webapp/
+              sudo chmod 700 /opt/webapp/" \
+              --quiet
+
       
     - name: Configure AWS CLI for Dev/Demo Account
       run: |
