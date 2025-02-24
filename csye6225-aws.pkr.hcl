@@ -175,7 +175,7 @@ build {
 
 
   provisioner "shell" {
-    script = "setup.sh"
+    script = "./setup.sh"
 
 
     environment_vars = [
@@ -190,9 +190,9 @@ build {
 
 
 
-  /*provisioner "shell" {
+  provisioner "shell" {
 
-    script = "init-app.sh"
-  }*/
+    script = "./init-app.sh"
+  }
 
 }
