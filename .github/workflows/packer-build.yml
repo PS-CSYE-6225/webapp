@@ -149,8 +149,6 @@ jobs:
         DEV_USER: ${{ secrets.DEV_USER }}
         DEMO_USER: ${{ secrets.DEMO_USER }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
-        GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
       run: |
        packer build \
         -var "vpc_id=${{ secrets.VPC_ID }}" \
@@ -160,7 +158,6 @@ jobs:
         -var "db_password=${{ secrets.DB_PASSWORD }}" \
         -var "dev_user=${{ secrets.DEV_USER }}" \
         -var "demo_user=${{ secrets.DEMO_USER }}" \
-        
         csye6225-aws.pkr.hcl
 
 
