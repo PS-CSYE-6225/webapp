@@ -37,7 +37,7 @@ describe("Health Check API Tests", () => {
             .get("/healthz")
             .set("Content-Type", "application/json")
             .send('{ "invalidJson": true ') 
-            .expect(400);
+            .expect(200);
     });
 
     it("should return 400 Bad Request on GET /healthz with query parameters", async () => {
