@@ -254,11 +254,10 @@ jobs:
     - name: Share GCP Image with Demo Project
       run: |
         if [[ -n "$GCP_IMAGE_ID" ]]; then
-          gcloud compute images add-iam-policy-binding "$GCP_IMAGE_ID" \
-          --project="${{ secrets.GCP_PROJECT_ID }}" \
-          --member="serviceAccount:gcp-demo@gcppackerdemo.iam.gserviceaccount.com" \
-          --role="roles/compute.imageUser"
-
+          gcloud compute images add-iam-policy-binding $GCP_IMAGE_ID \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --member="serviceAccount:${{ secrets.GCP_SA_DEMO }}" \
+            --role="roles/compute.imageUser"
           
           echo "Image $GCP_IMAGE_ID shared with DEMO Project"
         else
