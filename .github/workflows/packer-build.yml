@@ -236,14 +236,7 @@ jobs:
         
         if [[ -n "$GCP_IMAGE_ID" ]]; then
           echo "Latest GCP Image: $GCP_IMAGE_ID"
-          echo "GCP_IMAGE_ID=$GCP_IMAGE_ID" >> $GITHUB_ENV
-        else
-          echo "Not Found Image ID!"
-          exit 1
-        fi
 
-    - name: Share GCP Image with Demo Project
-      run: |
         if [[ -n "$GCP_IMAGE_ID" ]]; then
           gcloud compute images add-iam-policy-binding $GCP_IMAGE_ID \
             --project=${{ secrets.GCP_PROJECT_ID }} \
@@ -251,19 +244,25 @@ jobs:
             --role="roles/compute.imageUser"
           
           echo "Image $GCP_IMAGE_ID shared with DEMO Project"
-        else
-          echo "No GCP Image ID found!"
-          exit 1
-        fi
 
-    - name: Save GCP Image ID
-      run: echo "$GCP_IMAGE_ID" > gcp_image_id.txt
+
+        echo "GCP_IMAGE_ID=$GCP_IMAGE_ID" >> $GITHUB_ENV
+
+    
+        echo "$GCP_IMAGE_ID" > gcp_image_id.txt
+        else
+            echo "No AMI found, exiting..."
+            exit 1
+          fi
 
     - name: Upload GCP AMI ID Artifact
       uses: actions/upload-artifact@v4
       with:
           name: gcp_image_id
           path: gcp_image_id.txt
+          if-no-files-found: error
+          compression-level: 6
+          overwrite: true
 
 
     
