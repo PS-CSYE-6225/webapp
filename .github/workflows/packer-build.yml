@@ -160,8 +160,6 @@ jobs:
         -var "db_password=${{ secrets.DB_PASSWORD }}" \
         -var "dev_user=${{ secrets.DEV_USER }}" \
         -var "demo_user=${{ secrets.DEMO_USER }}" \
-        -var "gcp_project_id=${{ secrets.GCP_PROJECT_ID }}" \
-        -var "gcp_credentials=${{ secrets.GCP_SA_KEY }}" \
         csye6225-aws.pkr.hcl
 
 
