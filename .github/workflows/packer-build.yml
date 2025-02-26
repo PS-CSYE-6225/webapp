@@ -238,7 +238,7 @@ jobs:
           echo "Latest GCP Image: $GCP_IMAGE_ID"
           echo "GCP_IMAGE_ID=$GCP_IMAGE_ID" >> $GITHUB_ENV
         else
-          echo "No GCP Image found!"
+          echo "Not Found Image ID!"
           exit 1
         fi
 
