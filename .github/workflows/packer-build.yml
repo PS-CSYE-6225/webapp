@@ -253,10 +253,21 @@ jobs:
 
     - name: Share GCP Image with Demo Project
       run: |
-        gcloud compute images add-iam-policy-binding "$GCP_IMAGE_ID" \
-          --project="${{ secrets.GCP_PROJECT_ID }}" \
-          --member="user:${{ secrets.DEMO_USER }}" \
-          --role="roles/compute.imageUser"
+        if [[ -n "$GCP_IMAGE_ID" ]]; then
+          gcloud compute images add-iam-policy-binding $GCP_IMAGE_ID \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --member="serviceAccount:${{ secrets.GCP_SA_KEY_DEMO }}" \
+            --role="roles/compute.imageUser"
+          
+          echo "Image $GCP_IMAGE_ID shared with DEMO Project"
+        else
+          echo "No GCP Image ID found!"
+          exit 1
+        fi
+
+     
+    - name: Save GCP Image ID
+      run: echo "$GCP_IMAGE_ID" > gcp_image_id.txt
 
 
     - name: Upload GCP AMI ID Artifact
