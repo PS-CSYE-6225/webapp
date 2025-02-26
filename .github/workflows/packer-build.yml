@@ -225,35 +225,39 @@ jobs:
           if-no-files-found: error
           compression-level: 6
           overwrite: true
+
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          create_credentials_file: true
+          export_environment_variables: true
+          cleanup_credentials: true
       
     
-    
-    - name: Get Latest GCP Image ID
+    - name: Retrieve Latest GCP Image and Save IMAGE_ID
       run: |
         GCP_IMAGE_ID=$(gcloud compute images list \
-          --filter="name~'packer-*'" \
-          --sort-by="~creationTimestamp" --limit=1 --format="value(NAME)")
-        
-        if [[ -n "$GCP_IMAGE_ID" ]]; then
-          echo "Latest GCP Image: $GCP_IMAGE_ID"
+          --project=${{ secrets.GCP_PROJECT_ID }} \
+          --sort-by="~creationTimestamp" \
+          --limit=1 \
+          --format="value(NAME)")
 
         if [[ -n "$GCP_IMAGE_ID" ]]; then
-          gcloud compute images add-iam-policy-binding $GCP_IMAGE_ID \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --member="serviceAccount:${{ secrets.GCP_SA_KEY_DEMO }}" \
-            --role="roles/compute.imageUser"
-          
-          echo "Image $GCP_IMAGE_ID shared with DEMO Project"
-
-
-        echo "GCP_IMAGE_ID=$GCP_IMAGE_ID" >> $GITHUB_ENV
-
-    
-        echo "$GCP_IMAGE_ID" > gcp_image_id.txt
+          echo "Found latest GCP Image: $GCP_IMAGE_ID"
+          echo "GCP_IMAGE_ID=$GCP_IMAGE_ID" >> $GITHUB_ENV
         else
-            echo "No AMI found, exiting..."
-            exit 1
-          fi
+          echo "No GCP Image found!"
+          exit 1
+        fi
+
+    - name: Share GCP Image with Demo Project
+      run: |
+        gcloud compute images add-iam-policy-binding "$GCP_IMAGE_ID" \
+          --project="${{ secrets.GCP_PROJECT_ID }}" \
+          --member="user:${{ secrets.DEMO_USER }}" \
+          --role="roles/compute.imageUser"
+
 
     - name: Upload GCP AMI ID Artifact
       uses: actions/upload-artifact@v4
