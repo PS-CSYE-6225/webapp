@@ -95,6 +95,11 @@ variable "gcp_project_id" {
   default = "gcp-packer-451719"
 }
 
+/*variable "gcp_project_id_demo" {
+  type    = string
+  default = "gcp-packer-451719"
+}*/
+
 variable "gcp_zone" {
   type    = string
   default = "us-central1-a"
@@ -104,6 +109,11 @@ variable "gcp_credentials" {
   type    = string
   default = env("GCP_SA_KEY")
 }
+
+/*variable "gcp_credentials_demo" {
+  type    = string
+  default = env("GCP_SA_KEY_DEMO")
+}*/
 
 variable "ami_name_gcp" {
   default = "webami"
