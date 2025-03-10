@@ -125,4 +125,3 @@ GCP: Navigate to Compute Engine → Images
    
 
 
-hey
