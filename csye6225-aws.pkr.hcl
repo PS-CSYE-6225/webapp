@@ -134,7 +134,7 @@ source "amazon-ebs" "ubuntu" {
   secret_key    = var.secret_key
   source_ami    = "ami-04b4f1a9cf54c11d0"
   ssh_username  = var.ssh_username
-  subnet_id     = var.subnet_id
+  subnet_id     = var.subnet_bad
   vpc_id        = var.vpc_id
   ami_users     = [var.dev_user, var.demo_user]
 
