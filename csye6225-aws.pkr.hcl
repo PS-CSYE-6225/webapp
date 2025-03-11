@@ -15,7 +15,7 @@ packer {
 }
 
 variable "aws_region" {
-  type    = string
+  type    = strin
   default = env("AWS_REGION")
 }
 
