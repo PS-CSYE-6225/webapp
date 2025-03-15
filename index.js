@@ -9,8 +9,7 @@ const fileRoutes = require("./routes/fileRoutes");
 const app = express();
 app.use(express.json({strict: true}));
 
-app.use("/vi/file", fileRoutes);
-
+app.use("/v1/file", fileRoutes);
 
 
 app.use((err,req, res, next) => {
@@ -35,7 +34,7 @@ async function initializeApp() {
         if (require.main === module) {
             app.listen(8080, () => {
                 console.log("Server running on port 8080");
-            app.listen(5000, () => console.log("Server running on port 5000"));
+            
             });
         }
     } catch (err) {
