@@ -4,6 +4,7 @@ require('dotenv').config();
 
 // Load database credentials from environment variables
 const DB_HOST = process.env.DB_HOST;
+const HOST = process.env.HOST;
 const DB_USER = process.env.DB_USER;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 const DB_NAME = process.env.DB_NAME;
