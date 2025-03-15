@@ -16,20 +16,6 @@ const sequelize = new Sequelize(
     
   });
 
-  const checkDbConnection = async () => {
-    try {
-        await sequelize.authenticate();
-        logger.info('Connected to database successfully');
-        console.log('Connected to database successfully');
-        return true;
-    } catch (error) {
-        logger.error('Connection to database failed:', { error });
-        console.error('Connection to database failed:', error);
-        return false;
-    }
-};
-  
-
 // Ensure database exists before starting Sequelize
 const ensureDatabaseExists = async () => {
     try {
@@ -57,7 +43,7 @@ const initializeSequelize = async () => {
     await ensureDatabaseExists();
 
     // Connect Sequelize ORM to the database
-     sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+    const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
         host: DB_HOST,
         dialect: 'mysql',
         port: DB_PORT,
@@ -71,4 +57,4 @@ const initializeSequelize = async () => {
 };
 
 // Export a Promise that resolves to Sequelize instance
-module.exports = {checkDbConnection,initializeSequelize};
+module.exports = { sequelize, initializeSequelize };
