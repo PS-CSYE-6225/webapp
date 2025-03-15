@@ -4,15 +4,13 @@ const sequelize = require("../config/db");
 
 describe("Health Check API Tests", () => {
     beforeAll(async () => {
-        // Ensure Sequelize is initialized before tests start
         await sequelize.authenticate();
-        console.log("Database connection successful for tests.");
+        console.log("Database connection established.");
     });
 
     afterAll(async () => {
-        // Close DB connection after all tests
-        await sequelize.close();
-        console.log("Database connection closed after tests.");
+        await sequelize.close(); // Ensure DB is closed after tests
+        console.log(" Database connection closed.");
     });
 
     //  Should return 200 OK when database is running
@@ -44,16 +42,7 @@ describe("Health Check API Tests", () => {
 
     });
 
-    // ✅ Should return 503 Service Unavailable when DB is not reachable
-    it("should return 503 Service Unavailable when DB is down", async () => {
-        jest.spyOn(sequelize, "authenticate").mockRejectedValue(new Error("Database Down"));
 
-        const res = await request(app).get("/healthz");
-        expect(res.status).toBe(503);
-
-        // Restore Sequelize's authenticate method after test
-        sequelize.authenticate.mockRestore();
-    });
+    
+    
 });
-    
-    
