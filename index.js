@@ -1,81 +1,52 @@
-const express = require('express');
-const initializeSequelize = require('./config/db'); // Database initialization
-const loadHealthCheckModel = require('./models/healthCheck');
-const fileRoutes = require("./routes/fileRoutes");
+require("dotenv").config(); // Load environment variables at the start
 
-
-
+const express = require("express");
+const sequelize = require("./config/db"); // Import Sequelize instance
+const fileRoutes = require("./routes/fileRoutes"); // Import file upload routes
 
 const app = express();
-app.use(express.json({strict: true}));
 
-app.use("/api", fileRoutes);
+// Middleware
+app.use(express.json());
 
+// Routes
+app.use("/v1/file", fileRoutes);
 
-
-app.use((err,req, res, next) => {
-    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.set('Pragma', 'no-cache');
-        if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-            return res.status(400).send(); // Return 400 Bad Request if JSON is malformed
-        }
-        next();
-    });
-   
-
-async function initializeApp() {
+// Health Check API
+app.get("/healthz", async (req, res) => {
     try {
-        const sequelize = await initializeSequelize(); // Initialize database
-        await loadHealthCheckModel(sequelize); // Load model
-        app.locals.sequelize = sequelize; // Store Sequelize instance for tests
-
-        console.log(" Database connected successfully.");
-
-        // Start the server only if this script is run directly
-        if (require.main === module) {
-            app.listen(8080, () => {
-                console.log("Server running on port 8080");
-            app.listen(5000, () => console.log("Server running on port 5000"));
-            });
-        }
-    } catch (err) {
-        console.error(" Database initialization failed:", err);
-        process.exit(1);
-    }
-}
-
-initializeApp(); //  Initialize the app before Jest runs
-
-// Health Check API - /healthz
-app.get('/healthz', async (req, res) => {
-    try {
-        if (Object.keys(req.body).length > 0 ) {
-            return res.status(400).send();
-        }
-
-        if (Object.keys(req.query).length > 0) {
-            return res.status(400).send(); 
-        }
-        await app.locals.sequelize.models.HealthCheck.create({});
-        return res.status(200).send();
-    } catch (err) {
-      //  console.error(" Database error:", err);
-        return res.status(503).send();
+        await sequelize.authenticate(); // Check DB connection
+        res.status(200).send();
+    } catch (error) {
+        console.error("Database connection failed:", error);
+        res.status(503).send();
     }
 });
 
-// Handle unsupported methods
-app.all('/healthz', (req, res) => {
-    return res.status(405).send();
+// Catch-all for unsupported methods
+app.all("*", (req, res) => {
+    res.status(405).send({ error: "Method Not Allowed" });
 });
 
 
+const initializeApp = async () => {
+    try {
+        await sequelize.sync(); // Sync DB models
+        console.log(" Database is ready!");
 
+        // Start the server
+        const PORT = process.env.PORT || 8080;
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
 
-module.exports = app; // Export Express App
+    } catch (err) {
+        console.error("App initialization failed:", err);
+        process.exit(1); // Stop execution if DB is not connected
+    }
+};
 
+// Start the app
+initializeApp();
 
-
-
-
-
+module.exports = app; // Export for Jest testing
