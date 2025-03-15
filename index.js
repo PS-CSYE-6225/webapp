@@ -1,9 +1,17 @@
 const express = require('express');
 const initializeSequelize = require('./config/db'); // Database initialization
 const loadHealthCheckModel = require('./models/healthCheck');
+const fileRoutes = require("./routes/fileRoutes");
+
+
+
 
 const app = express();
 app.use(express.json({strict: true}));
+
+app.use("/api", fileRoutes);
+
+
 
 app.use((err,req, res, next) => {
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -27,6 +35,7 @@ async function initializeApp() {
         if (require.main === module) {
             app.listen(8080, () => {
                 console.log("Server running on port 8080");
+            app.listen(5000, () => console.log("Server running on port 5000"));
             });
         }
     } catch (err) {
@@ -59,6 +68,9 @@ app.get('/healthz', async (req, res) => {
 app.all('/healthz', (req, res) => {
     return res.status(405).send();
 });
+
+
+
 
 module.exports = app; // Export Express App
 
