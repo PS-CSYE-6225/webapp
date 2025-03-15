@@ -1,52 +1,81 @@
-require("dotenv").config(); // Load environment variables at the start
+const express = require('express');
+const Sequelize = require('./config/db'); // Database initialization
+const loadHealthCheckModel = require('./models/healthCheck');
+const fileRoutes = require("./routes/fileRoutes");
 
-const express = require("express");
-const sequelize = require("./config/db"); // Import Sequelize instance
-const fileRoutes = require("./routes/fileRoutes"); // Import file upload routes
+
+
 
 const app = express();
+app.use(express.json({strict: true}));
 
-// Middleware
-app.use(express.json());
+app.use("/vi/file", fileRoutes);
 
-// Routes
-app.use("/v1/file", fileRoutes);
 
-// Health Check API
-app.get("/healthz", async (req, res) => {
+
+app.use((err,req, res, next) => {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+        if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+            return res.status(400).send(); // Return 400 Bad Request if JSON is malformed
+        }
+        next();
+    });
+   
+
+async function initializeApp() {
     try {
-        await sequelize.authenticate(); // Check DB connection
-        res.status(200).send();
-    } catch (error) {
-        console.error("Database connection failed:", error);
-        res.status(503).send();
-    }
-});
+        const sequelize = await Sequelize(); // Initialize database
+        await loadHealthCheckModel(sequelize); // Load model
+        app.locals.sequelize = sequelize; // Store Sequelize instance for tests
 
-// Catch-all for unsupported methods
-app.all("*", (req, res) => {
-    res.status(405).send({ error: "Method Not Allowed" });
-});
+        console.log(" Database connected successfully.");
 
-
-const initializeApp = async () => {
-    try {
-        await sequelize.sync(); // Sync DB models
-        console.log(" Database is ready!");
-
-        // Start the server
-        const PORT = process.env.PORT || 8080;
-        app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
-        });
-
+        // Start the server only if this script is run directly
+        if (require.main === module) {
+            app.listen(8080, () => {
+                console.log("Server running on port 8080");
+            app.listen(5000, () => console.log("Server running on port 5000"));
+            });
+        }
     } catch (err) {
-        console.error("App initialization failed:", err);
-        process.exit(1); // Stop execution if DB is not connected
+        console.error(" Database initialization failed:", err);
+        process.exit(1);
     }
-};
+}
 
-// Start the app
-initializeApp();
+initializeApp(); //  Initialize the app before Jest runs
 
-module.exports = app; // Export for Jest testing
+// Health Check API - /healthz
+app.get('/healthz', async (req, res) => {
+    try {
+        if (Object.keys(req.body).length > 0 ) {
+            return res.status(400).send();
+        }
+
+        if (Object.keys(req.query).length > 0) {
+            return res.status(400).send(); 
+        }
+        await app.locals.sequelize.models.HealthCheck.create({});
+        return res.status(200).send();
+    } catch (err) {
+      //  console.error(" Database error:", err);
+        return res.status(503).send();
+    }
+});
+
+// Handle unsupported methods
+app.all('/healthz', (req, res) => {
+    return res.status(405).send();
+});
+
+
+
+
+module.exports = app; // Export Express App
+
+
+
+
+
+

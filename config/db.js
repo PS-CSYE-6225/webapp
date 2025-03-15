@@ -1,42 +1,53 @@
-const { Sequelize } = require("sequelize");
-require("dotenv").config();
+const { Sequelize } = require('sequelize');
+const mysql = require('mysql2/promise'); // Use promise-based MySQL for database management
+require('dotenv').config();
 
-// Check if running in production (AWS EC2)
-const isProduction = process.env.NODE_ENV === "production";
+// Load database credentials from environment variables
+const DB_HOST = process.env.DB_HOST;
+const DB_USER = process.env.DB_USER;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const DB_NAME = process.env.DB_NAME;
+const DB_PORT = process.env.DB_PORT || 8080;
 
-// Debugging: Print environment variables
-console.log("DB_HOST:", isProduction ? process.env.PROD_DB_HOST : process.env.DB_HOST);
+// Ensure database exists before starting Sequelize
+const ensureDatabaseExists = async () => {
+    try {
+        const connection = await mysql.createConnection({
+            host: DB_HOST,
+            user: DB_USER,
+            password: DB_PASSWORD,
+            port: DB_PORT,
+            charset: 'utf8mb4', //  Fix encoding issue
+            
+        });
 
-
-const sequelize = new Sequelize(
-  isProduction ? process.env.PROD_DB_NAME : process.env.DB_NAME,
-  isProduction ? process.env.PROD_DB_USER : process.env.DB_USER,
-  isProduction ? process.env.PROD_DB_PASSWORD : process.env.DB_PASSWORD,
-  {
-    host: isProduction ? process.env.PROD_DB_HOST : process.env.DB_HOST,
-    port: isProduction ? process.env.PROD_DB_PORT : process.env.DB_PORT || 3306,
-    dialect: "mysql",
-    logging: false,
-    pool: {
-      max: 10,
-      min: 0,
-      acquire: 30000,
-      idle: 10000,
-    },
-  }
-);
-
-
-const testDBConnection = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log(` Connected to ${isProduction ? "AWS RDS" : "MySQL"} successfully!`);
-  } catch (error) {
-    console.error("Database connection failed:", error);
-    process.exit(1);
-  }
+        // Create database if it doesn't exist
+        await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;`);
+        console.log(` Database '${DB_NAME}' is ready.`);
+        await connection.end();
+    } catch (err) {
+        console.error('Database creation failed:', err);
+        process.exit(1);
+    }
 };
 
-testDBConnection();
+// Create database if not exists, then initialize Sequelize
+const initializeSequelize = async () => {
+    await ensureDatabaseExists();
 
-module.exports = sequelize;
+    // Connect Sequelize ORM to the database
+    const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+        host: DB_HOST,
+        dialect: 'mysql',
+        port: DB_PORT,
+        logging: false, // Disable logging for cleaner output
+        dialectOptions: {
+            charset: 'utf8mb4', // Fix encoding issue
+        }
+    });
+
+    return sequelize;
+};
+
+// Export a Promise that resolves to Sequelize instance
+module.exports = initializeSequelize;

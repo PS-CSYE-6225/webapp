@@ -1,16 +1,20 @@
 const request = require("supertest");
 const app = require("../index"); // Import the app instance
-const sequelize = require("../config/db");
 
 describe("Health Check API Tests", () => {
     beforeAll(async () => {
-        await sequelize.authenticate();
-        console.log("Database connection established.");
+        // Wait for Sequelize to initialize before tests start
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for DB to initialize
+        if (!app.locals.sequelize) {
+            throw new Error("Sequelize instance is undefined!");
+        }
     });
 
     afterAll(async () => {
-        await sequelize.close(); // Ensure DB is closed after tests
-        console.log(" Database connection closed.");
+        //  Close DB connection after all tests
+        if (app.locals.sequelize) {
+            await app.locals.sequelize.close();
+        }
     });
 
     //  Should return 200 OK when database is running
@@ -20,7 +24,14 @@ describe("Health Check API Tests", () => {
             .expect(200);
     });
 
-    
+    //  Should return 400 Bad Request when payload is sent
+    it("should return 400 Bad Request on GET /healthz with payload", async () => {
+        await request(app)
+            .get("/healthz")
+            .send({ test: "payload" }) // Invalid request
+            .expect(400);
+    });
+
     it("should return 400 Bad Request on GET /healthz with broken JSON", async () => {
         await request(app)
             .get("/healthz")
@@ -29,7 +40,12 @@ describe("Health Check API Tests", () => {
             .expect(400);
     });
 
-    
+    it("should return 400 Bad Request on GET /healthz with query parameters", async () => {
+        await request(app)
+            .get("/healthz?keyparam=value") 
+            .expect(400);
+    });
+
     //  Should return 405 Method Not Allowed for non-GET requests
     const nonGetMethods = ["post", "put", "delete", "patch"];
 
@@ -42,7 +58,16 @@ describe("Health Check API Tests", () => {
 
     });
 
-
+    
+    //  Should return 503 Service Unavailable when DB is not reachable
+    it("should return 503 Service Unavailable when DB is not reachable", async () => {
+       //   Mock `HealthCheck.create()` to simulate a database error
+        jest.spyOn(app.locals.sequelize.models.HealthCheck, 'create').mockRejectedValue(new Error("Database Down"));
+    
+        await request(app)
+           .get("/healthz")
+            .expect(503);
+    });
     
     
 });
