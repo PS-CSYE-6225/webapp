@@ -2,7 +2,7 @@ const s3 = require("../config/s3");
 const { saveFile, getFileByName, deleteFile } = require("../models/fileModel");
 const { v4: uuidv4 } = require("uuid");
 
-const BUCKET_NAME = process.env.AWS_BUCKET_NAME;
+const BUCKET_NAME = process.env.S3_BUCKET_NAME;
 
 const uploadFile = async (req, res) => {
   if (!req.file) {
