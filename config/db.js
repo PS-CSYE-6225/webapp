@@ -3,18 +3,11 @@ const mysql = require('mysql2/promise'); // Use promise-based MySQL for database
 require('dotenv').config();
 
 // Load database credentials from environment variables
-const isTestEnv = process.env.GITHUB_ACTIONS === "true"; // Detect if running in GitHub Actions
-
-const sequelize = new Sequelize(
-  isTestEnv ? process.env.TEST_DB_NAME : process.env.DB_NAME,
-  isTestEnv ? process.env.TEST_DB_USER : process.env.DB_USER,
-  isTestEnv ? process.env.TEST_DB_PASSWORD : process.env.DB_PASSWORD,
-  {
-    host: isTestEnv ? process.env.TEST_DB_HOST : process.env.DB_HOST,
-    port: isTestEnv ? process.env.TEST_DB_PORT : process.env.DB_PORT,
-    dialect: "mysql",
-    
-  });
+const DB_HOST = process.env.DB_HOST;
+const DB_USER = process.env.DB_USER;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const DB_NAME = process.env.DB_NAME;
+const DB_PORT = process.env.DB_PORT || 8080;
 
 // Ensure database exists before starting Sequelize
 const ensureDatabaseExists = async () => {
@@ -57,4 +50,4 @@ const initializeSequelize = async () => {
 };
 
 // Export a Promise that resolves to Sequelize instance
-module.exports = { sequelize, initializeSequelize };
+module.exports = initializeSequelize;

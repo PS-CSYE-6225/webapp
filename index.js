@@ -1,5 +1,5 @@
 const express = require('express');
-const { sequelize, initializeSequelize } = require("./config/db");
+const initializeSequelize = require('./config/db'); // Database initialization
 const loadHealthCheckModel = require('./models/healthCheck');
 const fileRoutes = require("./routes/fileRoutes");
 
@@ -25,7 +25,7 @@ app.use((err,req, res, next) => {
 
 async function initializeApp() {
     try {
-         sequelize = await initializeSequelize(); // Initialize database
+        const sequelize = await initializeSequelize(); // Initialize database
         await loadHealthCheckModel(sequelize); // Load model
         app.locals.sequelize = sequelize; // Store Sequelize instance for tests
 
