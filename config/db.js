@@ -3,12 +3,25 @@ const mysql = require('mysql2/promise'); // Use promise-based MySQL for database
 require('dotenv').config();
 
 // Load database credentials from environment variables
-const DB_HOST = process.env.DB_HOST;
-const HOST = process.env.HOST;
-const DB_USER = process.env.DB_USER;
-const DB_PASSWORD = process.env.DB_PASSWORD;
-const DB_NAME = process.env.DB_NAME;
-const DB_PORT = process.env.DB_PORT || 8080;
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 3306,
+    
+  });
+
+  const checkDbConnection = async () => {
+    try {
+        await sequelize.authenticate();
+        logger.info('Connected to database successfully');
+        console.log('Connected to database successfully');
+        return true;
+    } catch (error) {
+        logger.error('Connection to database failed:', { error });
+        console.error('Connection to database failed:', error);
+        return false;
+    }
+};
+  
 
 // Ensure database exists before starting Sequelize
 const ensureDatabaseExists = async () => {
@@ -37,7 +50,7 @@ const initializeSequelize = async () => {
     await ensureDatabaseExists();
 
     // Connect Sequelize ORM to the database
-    const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+     sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
         host: DB_HOST,
         dialect: 'mysql',
         port: DB_PORT,
@@ -51,4 +64,4 @@ const initializeSequelize = async () => {
 };
 
 // Export a Promise that resolves to Sequelize instance
-module.exports = initializeSequelize;
+module.exports = {checkDbConnection,initializeSequelize};
