@@ -14,12 +14,12 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}  
-          MYSQL_DATABASE: ${{ secrets.DB_NAME }}  
+          MYSQL_ROOT_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}  
+          MYSQL_DATABASE: ${{ secrets.TEST_DB_NAME }}  
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 --user=root --password=$DB_PASSWORD" 
+          --health-cmd="mysqladmin ping -h 127.0.0.1 --user=root --password=$TEST_DB_PASSWORD" 
           --health-interval=10s 
           --health-timeout=5s 
           --health-retries=10
@@ -35,17 +35,23 @@ jobs:
 
       - name: Load Environment Variables
         run: |
+          echo "GITHUB_ACTIONS=true" >> $GITHUB_ENV
           echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
           echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV  
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
           echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
           echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+          echo "TEST_DB_HOST=${{ secrets.TEST_DB_HOST }}" >> $GITHUB_ENV
+          echo "TEST_DB_USER=${{ secrets.TEST_DB_USER }}" >> $GITHUB_ENV
+          echo "TEST_DB_PASSWORD=${{ secrets.TEST_DB_PASSWORD }}" >> $GITHUB_ENV
+          echo "TEST_DB_NAME=${{ secrets.TEST_DB_NAME }}" >> $GITHUB_ENV
+          echo "TEST_DB_PORT=${{ secrets.TEST_DB_PORT }}" >> $GITHUB_ENV
 
       - name: Wait for MySQL to be Ready
         run: |
           echo "Waiting for MySQL to start..."
           sleep 10
-          until mysql --host=127.0.0.1 --port=3306 --user=root --password=$DB_PASSWORD -e "SHOW DATABASES;"; do
+          until mysql --host=127.0.0.1 --port=3306 --user=root --password=$TEST_DB_PASSWORD -e "SHOW DATABASES;"; do
             echo "Waiting for MySQL..."
             sleep 5
           done

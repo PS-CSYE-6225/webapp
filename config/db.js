@@ -3,9 +3,15 @@ const mysql = require('mysql2/promise'); // Use promise-based MySQL for database
 require('dotenv').config();
 
 // Load database credentials from environment variables
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 3306,
+const isTestEnv = process.env.GITHUB_ACTIONS === "true"; // Detect if running in GitHub Actions
+
+const sequelize = new Sequelize(
+  isTestEnv ? process.env.TEST_DB_NAME : process.env.DB_NAME,
+  isTestEnv ? process.env.TEST_DB_USER : process.env.DB_USER,
+  isTestEnv ? process.env.TEST_DB_PASSWORD : process.env.DB_PASSWORD,
+  {
+    host: isTestEnv ? process.env.TEST_DB_HOST : process.env.DB_HOST,
+    port: isTestEnv ? process.env.TEST_DB_PORT : process.env.DB_PORT,
     dialect: "mysql",
     
   });
