@@ -124,3 +124,4 @@ AWS: Navigate to EC2 → AMIs
 GCP: Navigate to Compute Engine → Images
    
 
+hey 
