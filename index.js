@@ -1,5 +1,5 @@
 const express = require('express');
-const initializeSequelize = require('./config/db'); // Database initialization
+const Sequelize = require('./config/db'); // Database initialization
 const loadHealthCheckModel = require('./models/healthCheck');
 const fileRoutes = require("./routes/fileRoutes");
 
@@ -9,7 +9,7 @@ const fileRoutes = require("./routes/fileRoutes");
 const app = express();
 app.use(express.json({strict: true}));
 
-app.use("/api", fileRoutes);
+app.use("/vi/file", fileRoutes);
 
 
 
@@ -25,7 +25,7 @@ app.use((err,req, res, next) => {
 
 async function initializeApp() {
     try {
-        const sequelize = await initializeSequelize(); // Initialize database
+        const sequelize = await Sequelize(); // Initialize database
         await loadHealthCheckModel(sequelize); // Load model
         app.locals.sequelize = sequelize; // Store Sequelize instance for tests
 
