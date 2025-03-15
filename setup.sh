@@ -5,7 +5,7 @@ sudo apt-get install -y unzip
 sudo apt install -y curl
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - 
 sudo apt install -y nodejs
-#sudo apt-get install -y mysql-server
+sudo apt-get install -y mysql-server
 sudo node -v
 sudo npm -v
 npm install dotenv
@@ -13,9 +13,9 @@ npm install dotenv
 npm install express sequelize mysql2 dotenv
 sudo groupadd csye6225
 
-#echo "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '$DB_PASSWORD'; 
-#FLUSH PRIVILEGES; 
-#CREATE DATABASE cloudAppcsy6225;" | sudo mysql
+echo "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '$DB_PASSWORD'; 
+FLUSH PRIVILEGES; 
+CREATE DATABASE cloudd_App;" | sudo mysql
 
 
 
