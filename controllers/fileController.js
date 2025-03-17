@@ -2,40 +2,38 @@ const s3 = require("../config/s3");
 const { saveFile, getFileByName, deleteFile } = require("../models/fileModel");
 const { v4: uuidv4 } = require("uuid");
 
-const BUCKET_NAME = process.env.S3_BUCKET_NAME;
+//const BUCKET_NAME = process.env.S3_BUCKET_NAME;
 
 const uploadFile = async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ error: "No file uploaded" });
-    }
+  if (!req.file) {
+    return res.status(400).json({ error: "No file uploaded" });
+  }
 
-    const file = req.file;
-    const fileKey = `${uuidv4()}-${file.originalname}`;
+  const file = req.file;
+  const fileKey = `${uuidv4()}-${file.originalname}`;
 
-    const params = {
-        Bucket: BUCKET_NAME,
-        Key: fileKey,
-        Body: file.buffer,
-        ContentType: file.mimetype,
-    };
+  const params = {
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: fileKey,
+    Body: file.buffer,
+    ContentType: file.mimetype,
+  };
 
-    try {
-        await s3.upload(params).promise();
-        const fileUrl = `https://${BUCKET_NAME}.s3.amazonaws.com/${fileKey}`;
+  try {
+    console.log("Uploading file to S3:", params);
+    await s3.upload(params).promise();
+    
+    const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${fileKey}`;
+    await saveFile(file.originalname, fileUrl);
 
-        await saveFile(file.originalname, fileUrl);
-
-        res.status(201).json({
-            file_name: file.originalname,
-            url: fileUrl,
-            upload_date: new Date().toISOString(),
-        });
-    } catch (error) {
-        console.error("File Upload Error:", error);
-        res.status(500).json({ error: "File upload failed" });
-    }
+    res.status(201).json({ file_name: file.originalname, url: fileUrl });
+  } catch (error) {
+    console.error("S3 Upload Error:", error);  // Log S3 error
+    res.status(500).json({ error: "File upload failed", details: error.message });
+  }
 };
 
+      
 const getFile = async (req, res) => {
     const { file_name } = req.params;
 
