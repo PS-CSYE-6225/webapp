@@ -5,7 +5,6 @@ const { uploadFile, getFile, deleteFileController } = require("../controllers/fi
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-
 router.post("/", upload.single("file"), uploadFile);
 router.get("/:file_name", getFile);
 router.delete("/", deleteFileController);

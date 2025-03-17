@@ -1,20 +1,32 @@
-const pool = require("../config/db");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../config/db"); 
+const { v4: uuidv4 } = require("uuid");
 
-// Save file metadata
-const saveFile = async (file_name, url) => {
-  const query = `INSERT INTO files (file_name, url, upload_date) VALUES (?, ?, NOW())`;
-  await pool.execute(query, [file_name, url]);
-};
 
-// Get file metadata by name
-const getFileByName = async (file_name) => {
-  const [files] = await pool.execute(`SELECT * FROM files WHERE file_name = ?`, [file_name]);
-  return files.length ? files[0] : null;
-};
+// Define the File model
+const File = sequelize.define("File", {
+  id: {
+    type: DataTypes.STRING(36),
+    primaryKey: true,
+    allowNull: false,
+    defaultValue: () => uuidv4(),  
+    },
+    file_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    url: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    upload_date: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+    },
+}, {
+    tableName: "files",
+    timestamps: false, 
+});
 
-// Delete file metadata
-const deleteFile = async (file_name) => {
-  await pool.execute(`DELETE FROM files WHERE file_name = ?`, [file_name]);
-};
 
-module.exports = { saveFile, getFileByName, deleteFile };
+module.exports = File;
