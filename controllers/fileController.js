@@ -1,48 +1,56 @@
+const File = require("../models/fileModel");
 const s3 = require("../config/s3");
-const { saveFile, getFileByName, deleteFile } = require("../models/fileModel");
 const { v4: uuidv4 } = require("uuid");
 
-//const BUCKET_NAME = process.env.S3_BUCKET_NAME;
+const BUCKET_NAME = process.env.S3_BUCKET_NAME;
 
+// Upload File API
 const uploadFile = async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No file uploaded" });
-  }
+    if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+    }
 
-  const file = req.file;
-  const fileKey = `${uuidv4()}-${file.originalname}`;
+    const file = req.file;
+    const fileKey = `${uuidv4()}-${file.originalname}`;
 
-  const params = {
-    Bucket: process.env.S3_BUCKET_NAME,
-    Key: fileKey,
-    Body: file.buffer,
-    ContentType: file.mimetype,
-  };
+    const params = {
+        Bucket: BUCKET_NAME,
+        Key: fileKey,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+    };
 
-  try {
-    console.log("Uploading file to S3:", params);
-    await s3.upload(params).promise();
-    
-    const fileUrl = `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${fileKey}`;
-    await saveFile(file.originalname, fileUrl);
+    try {
+        await s3.upload(params).promise();
+        const fileUrl = `https://${BUCKET_NAME}.s3.amazonaws.com/${fileKey}`;
 
-    res.status(201).json({ file_name: file.originalname, url: fileUrl });
-  } catch (error) {
-    console.error("S3 Upload Error:", error);  // Log S3 error
-    res.status(500).json({ error: "File upload failed", details: error.message });
-  }
+        // Save file metadata using Sequelize ORM
+        const savedFile = await File.create({
+            file_name: file.originalname,
+            url: fileUrl,
+        });
+
+        res.status(201).json({
+            id: savedFile.id,
+            file_name: savedFile.file_name,
+            url: savedFile.url,
+            upload_date: savedFile.upload_date,
+        });
+    } catch (error) {
+        console.error("File Upload Error:", error);
+        res.status(500).json({ error: "File upload failed", details: error.message });
+    }
 };
 
-      
+// Get File API
 const getFile = async (req, res) => {
     const { file_name } = req.params;
 
     try {
-        const file = await getFileByName(file_name);
+        const file = await File.findOne({ where: { file_name } });
         if (!file) {
             return res.status(404).json({ error: "File not found" });
         }
-
         res.json(file);
     } catch (error) {
         console.error("Get File Error:", error);
@@ -50,11 +58,12 @@ const getFile = async (req, res) => {
     }
 };
 
+// Delete File API
 const deleteFileController = async (req, res) => {
     const { file_name } = req.body;
 
     try {
-        const file = await getFileByName(file_name);
+        const file = await File.findOne({ where: { file_name } });
         if (!file) {
             return res.status(404).json({ error: "File not found" });
         }
@@ -65,12 +74,12 @@ const deleteFileController = async (req, res) => {
         };
 
         await s3.deleteObject(params).promise();
-        await deleteFile(file_name);
+        await file.destroy();
 
         res.status(204).send();
     } catch (error) {
         console.error("Delete File Error:", error);
-        res.status(500).json({ error: "File deletion failed" });
+        res.status(500).json({ error: "File deletion failed", details: error.message });
     }
 };
 

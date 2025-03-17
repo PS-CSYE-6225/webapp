@@ -1,53 +1,37 @@
-const { Sequelize } = require('sequelize');
-const mysql = require('mysql2/promise'); // Use promise-based MySQL for database management
-require('dotenv').config();
+const { Sequelize } = require("sequelize");
+require("dotenv").config();
 
 // Load database credentials from environment variables
 const DB_HOST = process.env.DB_HOST;
 const DB_USER = process.env.DB_USER;
 const DB_PASSWORD = process.env.DB_PASSWORD;
 const DB_NAME = process.env.DB_NAME;
-const DB_PORT = process.env.DB_PORT || 8080;
+const DB_PORT = process.env.DB_PORT || 3306; // Default MySQL port
 
-// Ensure database exists before starting Sequelize
-const ensureDatabaseExists = async () => {
+// Initialize Sequelize
+const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+    host: DB_HOST,
+    dialect: "mysql",
+    port: DB_PORT,
+    logging: false, // Disable logging for cleaner output
+    dialectOptions: {
+        charset: "utf8mb4",
+    },
+});
+
+// Function to sync models and ensure database connection
+const initializeDatabase = async () => {
     try {
-        const connection = await mysql.createConnection({
-            host: DB_HOST,
-            user: DB_USER,
-            password: DB_PASSWORD,
-            port: DB_PORT,
-            charset: 'utf8mb4', //  Fix encoding issue
-            
-        });
-
-        // Create database if it doesn't exist
-        await connection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;`);
+        await sequelize.authenticate(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;`);
         console.log(` Database '${DB_NAME}' is ready.`);
-        await connection.end();
-    } catch (err) {
-        console.error('Database creation failed:', err);
+        await sequelize.sync({ force: true }); 
+        console.log("ImagetoS3 table is ready.");
+        return sequelize;
+    } catch (error) {
+        console.error("Database connection failed:", error);
         process.exit(1);
     }
+    
 };
 
-// Create database if not exists, then initialize Sequelize
-const initializeSequelize = async () => {
-    await ensureDatabaseExists();
-
-    // Connect Sequelize ORM to the database
-    const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
-        host: DB_HOST,
-        dialect: 'mysql',
-        port: DB_PORT,
-        logging: false, // Disable logging for cleaner output
-        dialectOptions: {
-            charset: 'utf8mb4', // Fix encoding issue
-        }
-    });
-
-    return sequelize;
-};
-
-// Export a Promise that resolves to Sequelize instance
-module.exports = initializeSequelize;
+module.exports = { sequelize, initializeDatabase };
