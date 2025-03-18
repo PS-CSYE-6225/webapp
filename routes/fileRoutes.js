@@ -9,14 +9,14 @@ router.head("/", (req, res) => {
     res.status(405).json({ error: "Method Not Allowed", message: "HEAD requests are not supported on this endpoint." });
 });
 
-router.head("/:file_name", (req, res) => {
+router.head("/:id", (req, res) => {
     res.status(405).json({ error: "Method Not Allowed", message: "HEAD requests are not supported on this endpoint." });
 });
 
 
 router.post("/", upload.single("file"), uploadFile);
-router.get("/:file_name", getFile);
-router.delete("/:file_name", deleteFileController);
+router.get("/:id", getFile);
+router.delete("/:id", deleteFileController);
 
 
 // Return 400 Bad Request for GET and DELETE on /v1/file (only valid for file/{id})
@@ -34,7 +34,7 @@ router.all("/", (req, res) => {
 });
 
 // Handle unsupported methods for `/v1/file/{file_name}`
-router.all("/:file_name", (req, res) => {
+router.all("/:id", (req, res) => {
     res.status(405).json({ error: "Method Not Allowed" });
 });
 
