@@ -42,20 +42,30 @@ const uploadFile = async (req, res) => {
     }
 };
 
-// Get File API
 const getFile = async (req, res) => {
-    const { file_name } = req.params;
+  const { file_name } = req.params;
 
-    try {
-        const file = await File.findOne({ where: { file_name } });
-        if (!file) {
-            return res.status(404).json({ error: "File not found" });
-        }
-        res.json(file);
-    } catch (error) {
-        console.error("Get File Error:", error);
-        res.status(500).json({ error: "Failed to retrieve file metadata" });
-    }
+  try {
+      // Fetch only file_name and url from DB
+      const file = await File.findOne({
+          where: { file_name },
+          attributes: ["file_name", "url"]  // Select only required fields
+      });
+
+      if (!file) {
+          return res.status(404).json({ error: "File not found" });
+      }
+
+      // Send response with only required metadata
+      res.json({
+          file_name: file.file_name,
+          url: file.url
+      });
+
+  } catch (error) {
+      console.error("Get File Error:", error);
+      res.status(500).json({ error: "Failed to retrieve file metadata" });
+  }
 };
 
 // Delete File API
