@@ -43,13 +43,13 @@ const uploadFile = async (req, res) => {
 };
 
 const getFile = async (req, res) => {
-  const { file_name } = req.params;
+  const { id } = req.params;
 
   try {
       // Fetch only file_name and url from DB
       const file = await File.findOne({
-          where: { file_name },
-          attributes: ["file_name", "url"]  // Select only required fields
+          where: { id },
+          attributes: ["id","file_name", "url","upload_date"]  // Select only required fields
       });
 
       if (!file) {
@@ -58,8 +58,10 @@ const getFile = async (req, res) => {
 
       // Send response with only required metadata
       res.json({
+          id:file.id,
           file_name: file.file_name,
-          url: file.url
+          url: file.url,
+          upload_date:file.upload_date,
       });
 
   } catch (error) {
@@ -70,10 +72,10 @@ const getFile = async (req, res) => {
 
 // Delete File API
 const deleteFileController = async (req, res) => {
-    const { file_name } = req.body;
+    const { id } = req.body;
 
     try {
-        const file = await File.findOne({ where: { file_name } });
+        const file = await File.findOne({ where: { id } });
         if (!file) {
             return res.status(404).json({ error: "File not found" });
         }
