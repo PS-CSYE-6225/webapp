@@ -5,7 +5,7 @@ sudo apt-get install -y unzip
 sudo apt install -y curl
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - 
 sudo apt install -y nodejs
-#sudo apt-get install -y mysql-server
+sudo apt-get install -y mysql-server
 sudo node -v
 sudo npm -v
 npm install dotenv
