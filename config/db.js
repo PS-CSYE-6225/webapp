@@ -1,4 +1,5 @@
 const { Sequelize } = require("sequelize");
+const { logger } = require("../logger"); // Import Winston logger
 require("dotenv").config();
 
 // Load database credentials from environment variables
@@ -22,16 +23,22 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
 // Function to sync models and ensure database connection
 const initializeDatabase = async () => {
     try {
-        await sequelize.authenticate(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;`);
-        console.log(` Database '${DB_NAME}' is ready.`);
-        await sequelize.sync({ force: true }); 
-        console.log("ImagetoS3 table is ready.");
+        logger.info("Attempting to connect to the database...");
+
+        await sequelize.authenticate(); // Correct usage of Sequelize authentication
+        logger.info(`Database '${DB_NAME}' connected successfully.`);
+        
+
+        await sequelize.sync({ alter: true }); // Ensures the schema matches models without dropping data
+        logger.info("All models synchronized successfully.");
+        //console.log("ImagetoS3 table is ready.");
+
         return sequelize;
     } catch (error) {
+        logger.error("Database connection failed:", { error: error.message });
         console.error("Database connection failed:", error);
         process.exit(1);
     }
-    
 };
 
 module.exports = { sequelize, initializeDatabase };

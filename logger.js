@@ -1,21 +1,17 @@
-import winston from 'winston';
+const winston = require("winston");
 
-const logFormat = winston.format.printf(({ level, message, timestamp, httpRequest}) => {
-    return JSON.stringify({
-      timestamp: timestamp,
-      severity: level.toUpperCase(),
-      message,
-      httpRequest
-    })
-  });
+const { createLogger, format, transports } = winston;
 
-const logger = winston.createLogger({
+const logger = createLogger({
+  format: format.combine(
+    format.timestamp(),
+    format.json()
+  ),
   level: "debug",
-  format: winston.format.combine(winston.format.timestamp(), logFormat),
   transports: [
-    new winston.transports.File({ filename: '/opt/webapp/logs/csye6225.log' }),
-    new winston.transports.Console(),
+    new transports.File({ filename: "/var/log/myapp.log" }),
+    new transports.Console(),
   ],
 });
 
-export default logger
+module.exports = { logger };

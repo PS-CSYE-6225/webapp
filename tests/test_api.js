@@ -1,5 +1,6 @@
 const request = require("supertest");
 const app = require("../index"); // Import the app instance
+const statsdClient = require("../metrics");
 
 describe("Health Check API Tests", () => {
     beforeAll(async () => {
@@ -15,6 +16,8 @@ describe("Health Check API Tests", () => {
         if (app.locals.sequelize) {
             await app.locals.sequelize.close();
         }
+
+        statsdClient.close();
     });
 
     //  Should return 200 OK when database is running
@@ -65,8 +68,8 @@ describe("Health Check API Tests", () => {
         jest.spyOn(app.locals.sequelize.models.HealthCheck, 'create').mockRejectedValue(new Error("Database Down"));
     
         await request(app)
-           .get("/healthz")
-            .expect(503);
+        .get("/healthz")
+        .expect(503);
     });
     
     
