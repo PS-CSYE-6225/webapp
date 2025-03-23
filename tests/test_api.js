@@ -65,8 +65,8 @@ describe("Health Check API Tests", () => {
         jest.spyOn(app.locals.sequelize.models.HealthCheck, 'create').mockRejectedValue(new Error("Database Down"));
     
         await request(app)
-           .get("/healthz")
-            .expect(503);
+        .get("/healthz")
+        .expect(503);
     });
     
     

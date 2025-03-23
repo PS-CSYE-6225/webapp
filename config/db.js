@@ -31,7 +31,7 @@ const initializeDatabase = async () => {
 
         await sequelize.sync({ alter: true }); // Ensures the schema matches models without dropping data
         logger.info("All models synchronized successfully.");
-        console.log("ImagetoS3 table is ready.");
+        //console.log("ImagetoS3 table is ready.");
 
         return sequelize;
     } catch (error) {
