@@ -151,7 +151,7 @@ source "amazon-ebs" "ubuntu" {
   }
 }
 
-source "googlecompute" "gcp_image" {
+/*source "googlecompute" "gcp_image" {
   project_id          = var.gcp_project_id
   source_image_family = "ubuntu-2004-lts"
   image_name          = "webami-gcp-${local.timestamp}"
@@ -159,10 +159,11 @@ source "googlecompute" "gcp_image" {
   zone                = var.gcp_zone
   credentials_file    = var.gcp_credentials
   ssh_username        = "ubuntu"
-}
+  "source.googlecompute.gcp_image"
+}*/
 
 build {
-  sources = ["source.amazon-ebs.ubuntu", "source.googlecompute.gcp_image"]
+  sources = ["source.amazon-ebs.ubuntu"]
 
 
   provisioner "file" {
