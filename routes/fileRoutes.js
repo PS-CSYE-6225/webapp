@@ -1,6 +1,6 @@
 const express = require("express");
 const multer = require("multer");
-const { uploadFile, getFile, deleteFileController } = require("../controllers/fileController");
+const { uploadFile, getFile, deleteFile } = require("../controllers/fileController");
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -16,7 +16,7 @@ router.head("/:id", (req, res) => {
 
 router.post("/", upload.single("file"), uploadFile);
 router.get("/:id", getFile);
-router.delete("/:id", deleteFileController);
+router.delete("/:id", deleteFile);
 
 
 // Return 400 Bad Request for GET and DELETE on /v1/file (only valid for file/{id})

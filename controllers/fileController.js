@@ -8,7 +8,7 @@ const BUCKET_NAME = process.env.S3_BUCKET_NAME;
 
 // Upload File API
 const uploadFile = async (req, res) => {
-    statsdClient.increment("api.uploadFile.call"); // Count API Calls
+    statsdClient.increment('api.uploadFile.requests');
     const startTime = Date.now(); // Start timer for API latency
 
     if (!req.file) {
@@ -43,6 +43,7 @@ const uploadFile = async (req, res) => {
         statsdClient.timing("db.insert.time", Date.now() - dbStartTime); // DB insert time
 
         logger.info(`File uploaded successfully: ${fileUrl}`);
+        statsdClient.increment('api.uploadFile.success');
         res.status(201).json({
             id: savedFile.id,
             file_name: savedFile.file_name,
@@ -59,7 +60,7 @@ const uploadFile = async (req, res) => {
 
 // Get File API
 const getFile = async (req, res) => {
-    statsdClient.increment("api.getFile.call"); // Count API Calls
+    statsdClient.increment("api.getFile.requests"); // Count API Calls
     const startTime = Date.now();
 
     const { id } = req.params;
@@ -79,6 +80,7 @@ const getFile = async (req, res) => {
         }
 
         logger.info(`File metadata retrieved successfully for ID: ${id}`);
+        statsdClient.increment('api.getFile.success');
         res.json({
             id: file.id,
             file_name: file.file_name,
@@ -94,8 +96,8 @@ const getFile = async (req, res) => {
 };
 
 // Delete File API
-const deleteFileController = async (req, res) => {
-    statsdClient.increment("api.deleteFile.call");
+const deleteFile = async (req, res) => {
+    statsdClient.increment("api.deleteFile.requests");
     const startTime = Date.now();
 
     const { id } = req.body;
@@ -125,6 +127,7 @@ const deleteFileController = async (req, res) => {
         statsdClient.timing("db.delete.time", Date.now() - dbDeleteTime); // DB delete time
 
         logger.info(`File deleted successfully: ${file.url}`);
+        statsdClient.increment('api.deleteFile.success');
         res.status(204).send();
 
         statsdClient.timing("api.deleteFile.time", Date.now() - startTime);
@@ -134,4 +137,4 @@ const deleteFileController = async (req, res) => {
     }
 };
 
-module.exports = { uploadFile, getFile, deleteFileController };
+module.exports = { uploadFile, getFile, deleteFile };
