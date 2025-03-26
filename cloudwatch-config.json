@@ -1,6 +1,6 @@
 {
     "agent": {
-        "metrics_collection_interval": 60,
+        "metrics_collection_interval": 10,
         "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
     },
     "logs": {
@@ -24,34 +24,12 @@
     "metrics": {
         "namespace": "webapp",
         "metrics_collected": {
-            "mem": {
-                "measurement": [
-                    "mem_used_percent"
-                ],
-                "metrics_collection_interval": 60
-            },
-            "disk": {
-                "measurement": [
-                    "used_percent"
-                ],
-                "metrics_collection_interval": 60,
-                "resources": [
-                    "*"
-                ]
-            },
-            "cpu": {
-                "measurement": [
-                    "cpu_usage_idle",
-                    "cpu_usage_user",
-                    "cpu_usage_system"
-                ],
-                "metrics_collection_interval": 60
-            },
+            "metrics_collection_interval": 10
+        },
             "statsd": {
                 "service_address": ":8125",
                 "metrics_collection_interval": 15,
-                "metrics_aggregation_interval": 60
+                "metrics_aggregation_interval": 300
             }
         }
     }
-}

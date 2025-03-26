@@ -4,8 +4,9 @@ const statsdClient = require("../metrics"); // Import StatsD client
 
 module.exports = async (sequelize) => {
     try {
-        statsdClient.increment("db.healthCheckModel.init"); // Track model initialization
         logger.info("Initializing HealthCheck model...");
+        statsdClient.increment("db.healthCheckModel.requests"); 
+    
 
         const HealthCheck = sequelize.define('HealthCheck', {
             id: {
@@ -27,6 +28,7 @@ module.exports = async (sequelize) => {
         statsdClient.timing("db.healthCheckModel.sync.time", Date.now() - startTime); // Track DB sync time
 
         logger.info("HealthCheck table is ready.");
+        statsdClient.increment('api.healthCheckModel.success');
     
 
         return HealthCheck;
