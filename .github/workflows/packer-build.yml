@@ -264,6 +264,12 @@ jobs:
        #   if-no-files-found: error
         #  compression-level: 6
          # overwrite: true
+    
+    - name: Download AMI_ID Artifact
+      uses: actions/download-artifact@v3
+      with:
+          name: ami_id
+     
 
     - name: Read AMI_ID
       id: read_ami_id
@@ -272,8 +278,8 @@ jobs:
           echo "AMI_ID: $AMI_ID"
           echo "ami_id=$AMI_ID" >> $GITHUB_ENV
 
-          - name: Configure AWS CLI for Dev/Demo Account
-          run: |
+    - name: Configure AWS CLI for Dev/Demo Account
+      run: |
             if [ "${{ secrets.DEPLOY_ENVIRONMENT }}" = "dev" ]; then
               aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
               aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
