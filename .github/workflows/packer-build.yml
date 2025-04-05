@@ -293,6 +293,10 @@ jobs:
               exit 1
             fi
 
+    - name: Debug Launch Template Name
+      run: |
+       echo "Launch Template Name: ${{ secrets.LAUNCH_TEMPLATE_NAME }}"
+
     - name: Create New Launch Template Version
       id: create_lt_version
       run: |
