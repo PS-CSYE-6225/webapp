@@ -40,6 +40,16 @@ variable "secret_key" {
   default = env("AWS_SECRET_ACCESS_KEY")
 }
 
+variable "access_key_prod" {
+  type    = string
+  default = env("AWS_ACCESS_KEY_ID_PROD")
+}
+
+variable "secret_key_prod" {
+  type    = string
+  default = env("AWS_SECRET_ACCESS_KEY_PROD")
+}
+
 variable "db_name" {
   type    = string
   default = env("DB_NAME")

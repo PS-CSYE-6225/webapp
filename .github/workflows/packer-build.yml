@@ -141,6 +141,8 @@ jobs:
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_ACCESS_KEY_ID_PROD: ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+        AWS_SECRET_ACCESS_KEY_PROD: ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
         DB_NAME: ${{ secrets.DB_NAME }}
         DB_USER: ${{ secrets.DB_USER }}
         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
@@ -161,21 +163,6 @@ jobs:
         -var "dev_user=${{ secrets.DEV_USER }}" \
         -var "demo_user=${{ secrets.DEMO_USER }}" \
         csye6225-aws.pkr.hcl
-
-
-
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          
-          aws-region: ${{ secrets.AWS_REGION }}
-          
-          
-
-    - name: Verify AWS Credentials
-      run: aws sts get-caller-identity
 
     - name: Retrieve Latest AMI and Save AMI_ID
       id: share_ami
@@ -285,8 +272,8 @@ jobs:
               aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
               aws configure set region ${{ secrets.AWS_REGION }}
             elif [ "${{ secrets.DEPLOY_ENVIRONMENT }}" = "demo" ]; then
-              aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
-              aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
+              aws configure set aws_access_key_id_prod ${{ secrets.AWS_ACCESS_KEY_ID_PROD }}
+              aws configure set aws_secret_access_key_prod ${{ secrets.AWS_SECRET_ACCESS_KEY_PROD }}
               aws configure set region ${{ secrets.AWS_REGION }}
             else
               echo "Invalid deploy environment specified: ${{ secrets.DEPLOY_ENVIRONMENT }}"
@@ -295,7 +282,7 @@ jobs:
 
     - name: Debug Launch Template Name
       run: |
-       echo "Launch Template Name: ${{ secrets.LAUNCH_TEMPLATE_NAME }}"
+       echo "Launch Template Name: ${{ env.LAUNCH_TEMPLATE_NAME }}"
 
     - name: Create New Launch Template Version
       id: create_lt_version
@@ -303,7 +290,7 @@ jobs:
         AMI_ID=${{ env.ami_id }}
         echo "Creating new Launch Template version with AMI ID: $AMI_ID"
         aws ec2 create-launch-template-version \
-          --launch-template-name ${{ secrets.LAUNCH_TEMPLATE_NAME }} \
+          --launch-template-name ${{ env.LAUNCH_TEMPLATE_NAME }} \
           --source-version 1 \
           --launch-template-data "{\"ImageId\":\"$AMI_ID\"}" \
           --no-cli-pager
