@@ -313,7 +313,7 @@ jobs:
           AMI_ID=${{ env.ami_id }}
           echo "Creating new Launch Template version with AMI ID: $AMI_ID"
           aws ec2 create-launch-template-version \
-              --launch-template-name ${{ env.LAUNCH_TEMPLATE_NAME }} \
+              --launch-template-name ${{ secrets.LAUNCH_TEMPLATE_NAME }} \
               --source-version 1 \
               --launch-template-data "{\"ImageId\":\"$AMI_ID\"}" \
               --no-cli-pager
@@ -323,7 +323,7 @@ jobs:
         id: start_refresh
         run: |
           REFRESH_ID=$(aws autoscaling start-instance-refresh \
-              --auto-scaling-group-name ${{ env.AUTO_SCALING_GROUP_NAME }} \
+              --auto-scaling-group-name ${{ secrets.AUTOSCALING_GROUP_NAME }} \
               --query "InstanceRefreshId" \
               --output text \
               --no-cli-pager)
@@ -336,7 +336,7 @@ jobs:
           echo "Waiting for instance refresh to complete..."
           while true; do
             STATUS=$(aws autoscaling describe-instance-refreshes \
-                --auto-scaling-group-name ${{ env.AUTO_SCALING_GROUP_NAME }} \
+                --auto-scaling-group-name ${{ secrets.AUTOSCALING_GROUP_NAME }} \
                 --query "InstanceRefreshes[?InstanceRefreshId=='${{ env.instance_refresh_id }}'].Status" \
                 --output text \
                 --no-cli-pager)
