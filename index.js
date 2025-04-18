@@ -68,6 +68,29 @@ app.get('/healthz', async (req, res) => {
     }
 });
 
+app.get('/cicd', async (req, res) => {
+    try {
+        logger.info("Health check requested.");
+
+        if (Object.keys(req.body).length > 0) {
+            logger.warn("Health check failed: Request body not empty.");
+            return res.status(400).send();
+        }
+
+        if (Object.keys(req.query).length > 0) {
+            logger.warn("Health check failed: Query parameters present.");
+            return res.status(400).send();
+        }
+
+        await app.locals.sequelize.models.HealthCheck.create({});
+        logger.info("Health check successful.");
+        return res.status(200).send();
+    } catch (err) {
+        logger.error("Health check failed:", { error: err.message });
+        return res.status(503).send();
+    }
+});
+
 // Handle unsupported methods with Logging
 app.all('/healthz', (req, res) => {
     logger.warn(`Unsupported method ${req.method} attempted on /healthz`);
